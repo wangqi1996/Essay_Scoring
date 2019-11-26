@@ -1,5 +1,6 @@
 # encoding=utf-8
-from feature.xiaoyl import word_length, get_sentence_length
+from src.feature.xiaoyl import word_length, get_sentence_length,word_bigram_train,word_bigram_test,word_trigram_train,\
+    word_trigram_test
 from src.data import Dataset
 import numpy as np
 #
@@ -20,6 +21,16 @@ class Feature:
         self.pos_tf_vocab = None
         self.pos_TF = None
 
+        self.mean_word_length = None
+        self.var_word_length = None
+        self.mean_sentence_length = None
+        self.var_sentence_length = None
+
+        self.word_bigram_TF = None
+        self.word_bigram_tf_vocab = None
+        self.word_trigram_TF = None
+        self.word_trigram_tf_vocab = None
+
         self.train_feature = None
 
     @staticmethod
@@ -34,6 +45,16 @@ class Feature:
         feature_class.pos_tf_vocab = feature.get('pos_tf_vocab', None)
         feature_class.pos_TF = feature.get('pos_TF', None)
 
+        feature_class.mean_word_length = feature.get('mean_word_length', None)
+        feature_class.var_word_length = feature.get('var_word_length', None)
+        feature_class.mean_sentence_length = feature.get('mean_sentence_length', None)
+        feature_class.var_sentence_length = feature.get('var_sentence_length', None)
+
+        feature_class.word_bigram_tf_vocab = feature.get('word_bigram_tf_vocab', None)
+        feature_class.word_bigram_TF = feature.get('word_bigram_TF', None)
+        feature_class.word_trigram_tf_vocab = feature.get('word_trigram_tf_vocab', None)
+        feature_class.word_trigram_TF = feature.get('word_trigram_TF', None)
+
         # 一个array数组
         feature_class.train_feature = feature.get('train_feature', None)
         return feature_class
@@ -46,6 +67,17 @@ class Feature:
             "wv_idf_diag": self.wv_idf_diag,
             "pos_tf_vocab": self.pos_tf_vocab,
             "pos_TF": self.pos_TF,
+
+            "mean_word_length": self.mean_word_length,
+            "var_word_length": self.var_word_length,
+            "mean_sentence_length": self.mean_sentence_length,
+            "var_sentence_length": self.var_sentence_length,
+
+            "word_bigram_tf_vocab": self.word_bigram_tf_vocab,
+            "word_bigram_TF": self.word_bigram_TF,
+            "word_trigram_tf_vocab": self.word_trigram_tf_vocab,
+            "word_trigram_TF": self.word_trigram_TF,
+
             "train_feature": train_feature
 
         }
@@ -63,6 +95,11 @@ class Feature:
         mean_word_length, var_word_length = word_length(token_set)
 
         mean_sentence_length, var_sentence_length = get_sentence_length(sentences_set)
+
+        self.mean_word_length = mean_word_length
+        self.var_word_length = var_word_length
+        self.mean_sentence_length = mean_sentence_length
+        self.var_sentence_length = var_sentence_length
 
         feature = self.append_feature(mean_clause_length, mean_clause_number, mean_word_length, var_word_length,
                                       mean_sentence_length, var_sentence_length)
@@ -89,6 +126,14 @@ class Feature:
         self.pos_tf_vocab = pos_tf_vocab
         self.pos_TF = pos_TF
 
+        word_bigram, word_bigram_TF, word_bigram_tf_vocab = word_bigram_train(tokens_list)
+        self.word_bigram_tf_vocab = word_bigram_tf_vocab
+        self.word_bigram_TF = word_bigram_TF
+
+        word_trigram, word_trigram_TF, word_trigram_tf_vocab = word_trigram_train(tokens_list)
+        self.word_trigram_tf_vocab = word_trigram_tf_vocab
+        self.word_trigram_TF = word_trigram_TF
+
         feature = self.append_feature(feature, wv_similarity, pos_bigram)
         # print(feature)
         # print(feature.shape)
@@ -101,8 +146,12 @@ class Feature:
         wv_similarity = word_vector_similarity_test(tokens_list, train_score, self.wv_tf_vocab, self.wv_idf_diag)
 
         pos_bigram = pos_bigram_test(tokens_list, self.pos_TF, self.pos_tf_vocab)
+        word_bigram = word_bigram_test(tokens_list, self.word_bigram_TF, self.word_bigram_tf_vocab)
 
+        word_trigram = word_trigram_test(tokens_list, self.word_trigram_TF, self.word_trigram_tf_vocab)
+        ######################
         # print(feature)
         # print(feature.shape)
-        feature = self.append_feature(feature, wv_similarity, pos_bigram)
+        feature = self.append_feature(feature, wv_similarity, pos_bigram, word_bigram, word_trigram)
+
         return feature

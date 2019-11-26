@@ -115,9 +115,12 @@ def tfidf_test(data, tf_vocab, idf_diag):
     return tfidf
 
 
-def tfTF_train(data):
+def tfTF_train(data,word_ngram=False):
     """ 计算tfTF input: sentences"""
-    vectorizer = CountVectorizer()
+    if word_ngram:
+        vectorizer = CountVectorizer(max_features=1000)
+    else:
+        vectorizer = CountVectorizer()
     train_tf = vectorizer.fit_transform(data).toarray()
     TF = np.sum(train_tf, 0)
 
@@ -126,9 +129,12 @@ def tfTF_train(data):
     return train_tf / TF, TF, tf_vocab
 
 
-def tfTF_test(data, TF, tf_vocab):
+def tfTF_test(data, TF, tf_vocab,word_ngram=False):
     """ 计算tfTF input: sentences"""
-    vectorizer = CountVectorizer(vocabulary=tf_vocab)
+    if word_ngram:
+        vectorizer = CountVectorizer(vocabulary=tf_vocab,max_features=1000)
+    else:
+        vectorizer = CountVectorizer(vocabulary=tf_vocab)
     tf = vectorizer.transform(data).toarray()
 
     return tf / (TF + tf)

@@ -15,6 +15,6 @@ DEV_DATA_PATH = r'../data/dev.pickle'
 
 ESSAY_SET_FIELD = 'essay_set'
 ESSAY_ID_FIELD = 'essay_id'
-ESSAY_FIELD = 'ESSAY'
+ESSAY_FIELD = 'essay'
 SCORE_FIELD = 'domain1_score'
 TOKENIZER_FIELD = 'essay_token'

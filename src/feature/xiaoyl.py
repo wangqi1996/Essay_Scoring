@@ -25,7 +25,7 @@ def word_length(data):
 
     return m_word_l, m_word_v
 
-
+"""
 def mean_word_length(tk_essay):
     m_word_l = []
     for essay in tk_essay:
@@ -52,8 +52,7 @@ def variance_word_length(essay_data):
     m_word_l = np.array(m_word_l)
     m_word_l.reshape(m_word_l.shape[0], 1)
     return m_word_l
-
-
+"""
 def get_sentence_length(data):
     """ input: sentences(token过后用join起来的)"""
 
@@ -94,7 +93,7 @@ def sentence_length(essay_data):
     sent_len = np.array(sent_len)
     return sent_len
 
-
+"""
 def mean_sentence_length(essay_data):
     m_sentence_l = []
     for essay in essay_data:
@@ -125,7 +124,7 @@ def variance_sentence_length(essay_data):
     m_sentence_l = np.array(m_sentence_l)
     m_sentence_l.reshape(m_sentence_l.shape[0], 1)
     return m_sentence_l
-
+"""
 
 def word_bigram_train(train_data):
     """ input: tokens"""
@@ -134,7 +133,7 @@ def word_bigram_train(train_data):
 
     join_data = [' '.join(d) for d in gramed_data]
 
-    train_tfTF, TF, tf_vocab = tfTF_train(join_data)
+    train_tfTF, TF, tf_vocab = tfTF_train(join_data,word_ngram=True)
 
     return train_tfTF, TF, tf_vocab
 
@@ -148,7 +147,7 @@ def word_bigram_test(test_data, TF, tf_vocab):
     gramed_data = ngram(test_data, 2)
 
     join_data = [' '.join(d) for d in gramed_data]
-    test_tfTF = tfTF_test(join_data, TF, tf_vocab)
+    test_tfTF = tfTF_test(join_data, TF, tf_vocab,word_ngram=True)
 
     return test_tfTF
 
@@ -160,12 +159,12 @@ def word_trigram_train(train_data):
 
     join_data = [' '.join(d) for d in gramed_data]
 
-    train_tfTF, TF, tf_vocab = tfTF_train(join_data)
+    train_tfTF, TF, tf_vocab = tfTF_train(join_data,word_ngram=True)
 
     return train_tfTF, TF, tf_vocab
 
 
-def word_bigram_test(test_data, TF, tf_vocab):
+def word_trigram_test(test_data, TF, tf_vocab):
     """ input: tokens (已经tokenizer的)"""
 
     assert TF is not None, u"测试阶段，TF不能为None"
@@ -174,6 +173,6 @@ def word_bigram_test(test_data, TF, tf_vocab):
     gramed_data = ngram(test_data, 3)
 
     join_data = [' '.join(d) for d in gramed_data]
-    test_tfTF = tfTF_test(join_data, TF, tf_vocab)
+    test_tfTF = tfTF_test(join_data, TF, tf_vocab,word_ngram=True)
 
     return test_tfTF

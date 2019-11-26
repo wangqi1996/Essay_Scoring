@@ -58,7 +58,7 @@ def pos_bigram_train(train_data):
 
     join_data = [' '.join(d) for d in gramed_data]
 
-    train_tfTF, TF, tf_vocab = tfTF_train(join_data)
+    train_tfTF, TF, tf_vocab = tfTF_train(join_data,word_ngram=False)
 
     return train_tfTF, TF, tf_vocab
 
@@ -76,7 +76,7 @@ def pos_bigram_test(test_data, TF, tf_vocab):
 
     # 3. 计算tfTF
     join_data = [' '.join(d) for d in gramed_data]
-    test_tfTF = tfTF_test(join_data, TF, tf_vocab)
+    test_tfTF = tfTF_test(join_data, TF, tf_vocab,word_ngram=False)
 
     return test_tfTF
 
