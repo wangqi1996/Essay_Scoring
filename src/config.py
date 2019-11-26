@@ -1,7 +1,7 @@
 # encoding=utf-8
 
 
-STANFORDCORENLP_PATH=r'E:\code\nlp_homeword\Essay-Scoring\lib\stanford-corenlp-full-2018-10-05'
+STANFORDCORENLP_PATH=r'E:\code\nlp_homeword\Essay_Scoring\lib\stanford-corenlp-full-2018-10-05'
 
 TRAIN_TADA_PATH = r'../data/train.pickle'
 TEST_DATA_PATH = r'../data/test.pickle'

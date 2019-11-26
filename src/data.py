@@ -49,7 +49,7 @@ class Dataset:
     @staticmethod
     def get_data_list(data, acquire_score=True):
         """ 根据eaasy_id获取tokenizer后的data和label """
-        essay_list = data[700: 750]
+        essay_list = data
 
         sentences_set = []
         token_set = []

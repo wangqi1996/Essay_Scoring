@@ -2,7 +2,7 @@
 from src.data import Dataset
 import numpy as np
 #
-from src.feature.feature1 import word_vector_similarity_train, pos_bigram_train, word_vector_similarity_test, \
+from src.feature.wangdq import word_vector_similarity_train, pos_bigram_train, word_vector_similarity_test, \
     mean_clause, pos_bigram_test
 
 

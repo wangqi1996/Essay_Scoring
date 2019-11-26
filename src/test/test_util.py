@@ -140,10 +140,7 @@ class TestUtil(unittest.TestCase):
 
     def test_constituenty_tree(self):
         corpus = [
-            'ABC cites the fact that chemical additives are banned in many countries and feels they may be banned in this state too ',
-            'ABC cites the fact that chemical additives are banned in many countries and feels they may be banned in this state too ',
-            'ABC cites the fact that chemical additives are banned in many countries and feels they may be banned in this state too and I hava and i i i'
-        ]
+            'Computers do  have any affect on kids we just love going on cause we use it for help and this persuade the readers of the local newspaper cause we need to be able to communicate also do writing essays and doing social studies or science homework my ideas are let us go computers cause were not bothering u can just leave us alone and let us do what you need to do cause what computers are what give us information for we have to do and were to do wat we got ta do and u people can just leave us alone cause are nt addicting to me or anyone and if we were it still would it matter cause a computers a computer u do nt punish it because just punish us from the computer punish us because of it cause its the computer fault it can be addicting cause the computer is device that ']
 
         result = constituency_tree(corpus)
         print(result)

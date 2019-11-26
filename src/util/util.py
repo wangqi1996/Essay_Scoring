@@ -106,13 +106,20 @@ def constituency_tree(train_data):
     clause_nums = []
     clause_lengths = []
     for sentence in train_data:
-        constituency_str = nlp.parse(sentence)
 
-        tree = Tree.fromstring(constituency_str)
         global clause_num
         global clause_length
         clause_num = 0
         clause_length = 0
+
+        if len(sentence) > 80:
+            clause_nums.append(clause_num)
+            clause_lengths.append(clause_length)
+            continue
+
+        constituency_str = nlp.parse(sentence)
+
+        tree = Tree.fromstring(constituency_str)
 
         # tree.draw()
         traverse_nltk_tree(tree, 'SBAR')
