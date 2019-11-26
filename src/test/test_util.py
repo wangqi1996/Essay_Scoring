@@ -2,8 +2,10 @@
 
 import unittest
 
+from feature.xiaoyl import word_length, get_sentence_length, mean_word_length, variance_word_length, \
+    mean_sentence_length, variance_sentence_length
 from src.util.tfidf import process_tfidf_data, tfidf_train, tfidf_test
-from src.util.util import word_stemming_remove_stop, tokenizer, pos_tagging, ngram, constituency_tree
+from src.util.util import word_stemming_remove_stop, tokenizer, pos_tagging, ngram, constituency_tree, get_sentences
 
 
 class TestUtil(unittest.TestCase):
@@ -146,3 +148,29 @@ class TestUtil(unittest.TestCase):
         print(result)
 
         return result
+
+    def test_get_sentences(self):
+        corpus = [
+            'A . B.C'
+        ]
+        result = get_sentences(corpus[0])
+
+        return result
+
+    def test_word_length(self):
+        corpus = [
+            'Computers do  have any affect on kids we just love going on cause we use it for help and this persuade the readers of the local newspaper cause we need to be able to . communicate also do writing essays and doing social studies or science . homework my ideas are let us go computers cause were not bothering u can just leave us alone and let us do what you need to do cause what computers are what give us information for we have to do and were to do wat we got ta do and u people can just leave us alone cause are nt addicting to me or anyone and if we were it still would it matter cause a computers a computer u do nt punish it because just punish us from the computer punish us because of it cause its the computer fault it can be addicting cause the computer . is device that ']
+
+        result = word_length(tokenizer(corpus))
+        print(result)
+
+        result = get_sentence_length(corpus)
+        print(result)
+
+        print(mean_word_length(corpus))
+
+        print(variance_word_length(corpus))
+
+        print(mean_sentence_length(corpus))
+
+        print(variance_sentence_length(corpus))

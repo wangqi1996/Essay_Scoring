@@ -105,29 +105,39 @@ def constituency_tree(train_data):
     nlp = StanfordCoreNLP(STANFORDCORENLP_PATH)
     clause_nums = []
     clause_lengths = []
-    for sentence in train_data:
+    sentences_num = []
+    for essay in train_data:
 
         global clause_num
         global clause_length
         clause_num = 0
         clause_length = 0
 
-        if len(sentence) > 80:
-            clause_nums.append(clause_num)
-            clause_lengths.append(clause_length)
-            continue
+        # 对每句话进行处理
+        sentences = get_sentences(essay)
+        sentences_num.append(len(sentences))
 
-        constituency_str = nlp.parse(sentence)
+        for sentence in sentences:
 
-        tree = Tree.fromstring(constituency_str)
+            tokens = word_tokenize(sentence)
 
-        # tree.draw()
-        traverse_nltk_tree(tree, 'SBAR')
+            if len(tokens) > 80:
+                clause_nums.append(clause_num)
+                clause_lengths.append(clause_length)
+                continue
+
+            constituency_str = nlp.parse(sentence)
+            tree = Tree.fromstring(constituency_str)
+
+            # tree.draw()
+            traverse_nltk_tree(tree, 'SBAR')
+
         clause_nums.append(clause_num)
         clause_lengths.append(clause_length)
+
     nlp.close()
 
-    return np.array(clause_lengths), np.array(clause_nums)
+    return np.array(clause_lengths), np.array(clause_nums), np.array(sentences_num)
 
 
 def traverse_nltk_tree(node, label):
@@ -150,3 +160,10 @@ def traverse_nltk_tree(node, label):
     for i in range(node_num):
         traverse_nltk_tree(node[i], label)
     return
+
+
+def get_sentences(essay):
+    """ 将文章分成多句话
+    测试发现，必须得是tokenizer之后的sentences"""
+    result = nltk.sent_tokenize(essay)
+    return result

@@ -26,6 +26,7 @@ def word_vector_similarity_train(train_data, scores):
     result = sum_attn / (sample_num - 1)
     return result.reshape(sample_num, 1), tf_vocab, idf_diag
 
+
 def word_vector_similarity_test(test_data, train_score_list, tf_vocab, idf_diag):
     """ input: tokens (已经tokenizer的)"""
 
@@ -86,14 +87,16 @@ def mean_clause(data):
     """
     assert data is not None, u"data不能为none"
 
-    clause_lengths, clause_nums = constituency_tree(data)
+    clause_lengths, clause_nums, sentences_num = constituency_tree(data)
 
+    mean_clause_num = clause_nums / sentences_num
     # 暂时for处理了
     for i in range(len(clause_nums)):
         if clause_nums[i] == 0:
             clause_nums[i] = 1
+
     mean_clause_length = clause_lengths / clause_nums
 
-    # TODO 需要肖肖的序列长度处理一下
+
     sample_num = len(data)
-    return mean_clause_length.reshape(sample_num, 1), clause_nums.reshape(sample_num, 1)
+    return mean_clause_length.reshape(sample_num, 1), mean_clause_num.reshape(sample_num, 1)

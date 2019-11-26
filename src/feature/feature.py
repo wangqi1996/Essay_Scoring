@@ -1,4 +1,5 @@
 # encoding=utf-8
+from feature.xiaoyl import word_length, get_sentence_length
 from src.data import Dataset
 import numpy as np
 #
@@ -27,7 +28,12 @@ class Feature:
 
         mean_clause_length, mean_clause_number = mean_clause(sentences_set)
 
-        feature = self.append_feature(mean_clause_length, mean_clause_number)
+        mean_word_length, var_word_length = word_length(token_set)
+
+        mean_sentence_length, var_sentence_length = get_sentence_length(sentences_set)
+
+        feature = self.append_feature(mean_clause_length, mean_clause_number, mean_word_length, var_word_length,
+                                      mean_sentence_length, var_sentence_length)
         return feature
 
     def get_train_feature(self, sentences_list, tokens_list, scores):
@@ -41,7 +47,6 @@ class Feature:
         self.wv_idf_diag = wv_idf_diag
         self.wv_tf_vocab = wv_tf_vocab
 
-        # [*, *(TODO 是否需要裁剪)]
         pos_bigram, pos_TF, pos_tf_vocab = pos_bigram_train(tokens_list)
         self.pos_tf_vocab = pos_tf_vocab
         self.pos_TF = pos_TF
