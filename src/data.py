@@ -12,6 +12,7 @@ class Dataset:
     def __init__(self):
         self.data = {}
         self.normalize_dict = {}
+        self.feature = {}  # 存储feature和中间变量
 
     def load_from_raw_file(self, filename, field_require):
         tokenizer = spacy.load("en_core_web_sm")
@@ -45,6 +46,13 @@ class Dataset:
         max_value = normalize_dict[set_id][field]['max']
         for sample in self.data[set_id]:
             sample[field] = (sample[field] - min_value) / (max_value - min_value)
+
+    def save_feature(self, set_id, data):
+        self.feature.setdefault(str(set_id), {})
+        self.feature[str(set_id)].update(data)
+
+    def load_feature(self, set_id):
+        return self.feature.get(str(set_id), {})
 
     @staticmethod
     def get_data_list(data, acquire_score=True):
@@ -87,11 +95,11 @@ class Dataset:
 # train_dataset = Dataset()
 # train_dataset.load_from_raw_file('../data/train.tsv', ['essay_set', 'essay_id', 'essay', 'domain1_score'])
 # Dataset.save(train_dataset, '../data/train.pickle')
-# #
+# # #
 # dev_dataset = Dataset()
 # dev_dataset.load_from_raw_file('../data/dev.tsv', ['essay_set', 'essay_id', 'essay', 'domain1_score'])
 # Dataset.save(dev_dataset, '../data/dev.pickle')
-# #
+# # #
 # #
 #
 # test_dataset = Dataset()

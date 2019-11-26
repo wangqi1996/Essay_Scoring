@@ -122,8 +122,6 @@ def constituency_tree(train_data):
             tokens = word_tokenize(sentence)
 
             if len(tokens) > 80:
-                clause_nums.append(clause_num)
-                clause_lengths.append(clause_length)
                 continue
 
             constituency_str = nlp.parse(sentence)

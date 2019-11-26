@@ -3,7 +3,7 @@
 
 STANFORDCORENLP_PATH=r'E:\code\nlp_homeword\Essay_Scoring\lib\stanford-corenlp-full-2018-10-05'
 
-TRAIN_TADA_PATH = r'../data/train.pickle'
+TRAIN_DADA_PATH = r'../data/train.pickle'
 TEST_DATA_PATH = r'../data/test.pickle'
 DEV_DATA_PATH = r'../data/dev.pickle'
 
