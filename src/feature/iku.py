@@ -1,5 +1,4 @@
 from spellchecker import SpellChecker
-import stanfordnlp
 from nltk.tokenize import sent_tokenize
 from stanfordcorenlp import StanfordCoreNLP
 from nltk.tree import *

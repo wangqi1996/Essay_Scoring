@@ -2,6 +2,8 @@
 import sys
 
 import numpy as np
+from sklearn.ensemble import GradientBoostingRegressor
+
 sys.path.append("..")
 
 import argparse
@@ -107,6 +109,13 @@ def model(model_name, feature, label, set_id):
         # clf = SVR(kernel='rbf', gamma='scale', C=1.0, epsilon=0.2)
         clf.fit(feature, label.ravel())
 
+    if model_name == 'GBDT':
+        clf = GradientBoostingRegressor(loss='ls', learning_rate=0.1, n_estimators=100, subsample=1
+                                        , min_samples_split=2, min_samples_leaf=1, max_depth=3
+                                        , init=None, random_state=None, max_features=None
+                                        , alpha=0.9, verbose=0, max_leaf_nodes=None, warm_start=False)
+        clf.fit(feature, label.ravel())
+
     print("end train model for essay set ", set_id)
     return clf
 
@@ -115,7 +124,7 @@ if __name__ == '__main__':
 
     parse = argparse.ArgumentParser()
     parse.add_argument("--run", type=str, default='train', help='train or test', choices=['train', 'test'])
-    parse.add_argument("--model", type=str, default='SVR', help='SVR, ', choices=['SVR'])
+    parse.add_argument("--model", type=str, default='GBDT', help='SVR, ', choices=['SVR', ['GBDT']])
     parse.add_argument("--use_save", type=bool, default=False, help='use saved feature or not')
     args = parse.parse_args()
 

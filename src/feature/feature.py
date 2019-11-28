@@ -103,11 +103,15 @@ class Feature:
         result = {
             "wv_tf_vocab": self.wv_tf_vocab,
             "wv_idf_diag": self.wv_idf_diag,
-            "pos_tf_vocab": self.pos_tf_vocab,
-            "pos_TF": self.pos_TF,
+            "wv_tfidf": self.wv_tfidf,
+            "pos_2tf_vocab": self.pos_2tf_vocab,
+            "pos_2TF": self.pos_2TF,
+            "pos_3TF": self.pos_3TF,
+            "pos_3tf_vocab": self.pos_3tf_vocab,
 
             "wv_similarity": self.wv_similarity,
             "pos_bigram": self.pos_bigram,
+            "pos_trigram": self.pos_trigram,
             "word_bigram": self.word_bigram,
             "word_trigram": self.word_trigram,
 
@@ -250,17 +254,17 @@ class Feature:
             feature = self.concatenate_feature(feature, wv_similarity)
 
         if 'pos_bigram' in feature_list:
-            pos_bigram, pos_TF, pos_tf_vocab = pos_gram_train(tokens_list, 2)
+            pos_bigram, pos_2TF, pos_2tf_vocab = pos_gram_train(tokens_list, 2)
             self.pos_bigram = pos_bigram
-            self.pos_2tf_vocab = pos_tf_vocab
-            self.pos_2TF = pos_TF
+            self.pos_2tf_vocab = pos_2tf_vocab
+            self.pos_2TF = pos_2TF
             feature = self.concatenate_feature(feature, pos_bigram)
 
         if 'pos_trigram' in feature_list:
-            pos_trigram, pos_TF, pos_tf_vocab = pos_gram_train(tokens_list, 3)
+            pos_trigram, pos_3TF, pos_3tf_vocab = pos_gram_train(tokens_list, 3)
             self.pos_trigram = pos_trigram
-            self.pos_3tf_vocab = pos_tf_vocab
-            self.pos_3TF = pos_TF
+            self.pos_3tf_vocab = pos_3tf_vocab
+            self.pos_3TF = pos_3TF
             feature = self.concatenate_feature(feature, pos_trigram)
 
         if 'word_bigram' in feature_list:

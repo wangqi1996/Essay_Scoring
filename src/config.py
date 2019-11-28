@@ -22,11 +22,11 @@ feature_list = [
     "wv_similarity",
     "pos_bigram",
     "pos_trigram",
-    # "word_bigram",
-    # "word_trigram",
+    "word_bigram",
+    "word_trigram",
 
-    "mean_clause_length",
-    "mean_clause_number",
+    # "mean_clause_length",
+    # "mean_clause_number",
 
     "mean_word_length",
     "var_word_length",
@@ -34,8 +34,8 @@ feature_list = [
     "var_sentence_length",
 
     "spell_error",
-    "mean_sentence_depth",
-    "mean_sentence_level",
+    # "mean_sentence_depth",
+    # "mean_sentence_level",
     "essay_length",
     "semantic_vector_similarity",
 ]
