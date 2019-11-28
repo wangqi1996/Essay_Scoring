@@ -135,6 +135,7 @@ def tfTF_test(data, TF, tf_vocab,word_ngram=False):
         vectorizer = CountVectorizer(vocabulary=tf_vocab,max_features=1000)
     else:
         vectorizer = CountVectorizer(vocabulary=tf_vocab)
+
     tf = vectorizer.transform(data).toarray()
 
     return tf / (TF + tf)

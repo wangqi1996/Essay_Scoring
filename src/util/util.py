@@ -70,7 +70,7 @@ def matrix_cosine_similarity(matrix1, matrix2=None):
     if matrix2 is None:
         matrix2 = matrix1
 
-    cosine = cosine_similarity(matrix1)
+    cosine = cosine_similarity(matrix1, matrix2)
     return cosine
 
 

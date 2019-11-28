@@ -29,7 +29,7 @@ def word_vector_similarity_train(train_data, scores):
     return result.reshape(sample_num, 1), tf_vocab, idf_diag, tfidf
 
 
-def word_vector_similarity_test(test_data, train_score_list, tf_vocab, idf_diag):
+def word_vector_similarity_test(test_data, train_score_list, tf_vocab, idf_diag, train_tfidf):
     """ input: tokens (已经tokenizer的)"""
 
     assert idf_diag is not None, u"测试阶段，idf_diag不能为None"
@@ -37,21 +37,23 @@ def word_vector_similarity_test(test_data, train_score_list, tf_vocab, idf_diag)
 
     print("word_vector_similarity_test")
 
-    sample_num = train_score_list.shape[0]
+    train_sample_num = train_score_list.shape[0]
+    test_sample_num = len(test_data)
+    # print(test_sample_num)
 
     test_data = process_tfidf_data(test_data)
 
     tfidf = tfidf_test(test_data, tf_vocab, idf_diag)
-    cosine = matrix_cosine_similarity(tfidf)
+    cosine = matrix_cosine_similarity(tfidf, train_tfidf)
 
     attn = train_score_list.T * cosine
     np.fill_diagonal(attn, 0)
     sum_attn = np.sum(attn, 1)
-    result = sum_attn / (sample_num - 1)
-    return result.reshape(sample_num, 1)
+    result = sum_attn / (train_sample_num - 1)
+    return result.reshape(test_sample_num, 1)
 
 
-def pos_bigram_train(train_data):
+def pos_gram_train(train_data, gram):
     """ input: tokens"""
 
     print("pos_bigram_train")
@@ -60,16 +62,16 @@ def pos_bigram_train(train_data):
     tagged_data = pos_tagging(train_data)
 
     # 2. 组成2-gram
-    gramed_data = ngram(tagged_data, 2)
+    gramed_data = ngram(tagged_data, gram)
 
     join_data = [' '.join(d) for d in gramed_data]
 
-    train_tfTF, TF, tf_vocab = tfTF_train(join_data,word_ngram=False)
+    train_tfTF, TF, tf_vocab = tfTF_train(join_data, word_ngram=False)
 
     return train_tfTF, TF, tf_vocab
 
 
-def pos_bigram_test(test_data, TF, tf_vocab):
+def pos_gram_test(test_data, TF, tf_vocab, gram):
     """ input: tokens (已经tokenizer的)"""
 
     print("pos_bigram_test")
@@ -80,11 +82,11 @@ def pos_bigram_test(test_data, TF, tf_vocab):
     tagged_data = pos_tagging(test_data)
 
     # 2. 组成2-gram
-    gramed_data = ngram(tagged_data, 2)
+    gramed_data = ngram(tagged_data, gram)
 
     # 3. 计算tfTF
     join_data = [' '.join(d) for d in gramed_data]
-    test_tfTF = tfTF_test(join_data, TF, tf_vocab,word_ngram=False)
+    test_tfTF = tfTF_test(join_data, TF, tf_vocab, word_ngram=False)
 
     return test_tfTF
 
@@ -106,7 +108,6 @@ def mean_clause(data):
             clause_nums[i] = 1
 
     mean_clause_length = clause_lengths / clause_nums
-
 
     sample_num = len(data)
     return mean_clause_length.reshape(sample_num, 1), mean_clause_num.reshape(sample_num, 1)
