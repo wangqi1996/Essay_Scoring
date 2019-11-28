@@ -142,7 +142,7 @@ class Feature:
         """ 不用区分训练测试的, 可以写在这类"""
         feature = None
 
-        if 'mean_clause_length' or 'mean_clause_number' in feature_list:
+        if 'mean_clause_length' in feature_list or 'mean_clause_number' in feature_list:
             mean_clause_length, mean_clause_number = mean_clause(sentences_set)
             self.mean_clause_number = mean_clause_number
             self.mean_clause_length = mean_clause_length
@@ -151,7 +151,7 @@ class Feature:
             if 'mean_clause_number' in feature_list:
                 feature = self.concatenate_feature(feature, mean_clause_number)
 
-        if 'mean_word_length' or 'var_word_length' in feature_list:
+        if 'mean_word_length' in feature_list or 'var_word_length' in feature_list:
             mean_word_length, var_word_length = word_length(token_set)
             self.mean_word_length = mean_word_length
             self.var_word_length = var_word_length
@@ -160,7 +160,7 @@ class Feature:
             if 'var_word_length' in feature_list:
                 feature = self.concatenate_feature(feature, var_word_length)
 
-        if 'mean_sentence_length' or 'var_sentence_length' in feature_list:
+        if 'mean_sentence_length' in feature_list or 'var_sentence_length' in feature_list:
             mean_sentence_length, var_sentence_length = get_sentence_length(sentences_set)
             self.mean_sentence_length = mean_sentence_length
             self.var_sentence_length = var_sentence_length
@@ -174,7 +174,7 @@ class Feature:
             self.spell_error = error
             feature = self.concatenate_feature(feature, error)
 
-        if 'mean_sentence_depth' or 'mean_sentence_level' in feature_list:
+        if 'mean_sentence_depth' in feature_list or 'mean_sentence_level' in feature_list:
             depth, level = Mean_sentence_depth_level(train_data)
             self.mean_sentence_level = level
             self.mean_sentence_depth = depth
@@ -212,23 +212,17 @@ class Feature:
             feature = self.concatenate_feature(feature, self.var_sentence_length)
 
         if 'spell_error' in feature_list:
-            error = spell_error(train_data)
-            self.spell_error = error
             feature = self.concatenate_feature(feature, self.spell_error)
 
-        if 'mean_sentence_depth' or 'mean_sentence_level' in feature_list:
-            depth, level = Mean_sentence_depth_level(train_data)
-            self.mean_sentence_level = level
-            self.mean_sentence_depth = depth
-            if 'mean_sentence_depth' in feature_list:
-                feature = self.concatenate_feature(feature, depth)
-            if 'mean_sentence_level' in feature_list:
-                feature = self.concatenate_feature(feature, level)
+        if 'mean_sentence_depth' in feature_list:
+            feature = self.concatenate_feature(feature, self.mean_sentence_depth)
+        if 'mean_sentence_level' in feature_list:
+            feature = self.concatenate_feature(feature, self.mean_sentence_length)
 
         if 'essay_length' in feature_list:
-            length = essay_length(train_data)
-            self.essay_length = length
-            feature = self.concatenate_feature(feature, length)
+            feature = self.concatenate_feature(feature, self.essay_length)
+
+        return feature
 
 
     def get_train_feature(self, sentences_list, tokens_list, scores, train_data):
@@ -248,7 +242,7 @@ class Feature:
             self.wv_similarity = wv_similarity
             self.wv_idf_diag = wv_idf_diag
             self.wv_tf_vocab = wv_tf_vocab
-            feature = self.concatenate_feature(feature, wv_similarity)
+            feature = self.concatenate_feature(feature, self.wv_similarity)
         if 'pos_bigram' in feature_list:
             pos_bigram, pos_TF, pos_tf_vocab = pos_bigram_train(tokens_list)
             self.pos_bigram = pos_bigram
@@ -278,6 +272,24 @@ class Feature:
         # print(feature)
         # print('train_feature', feature.shape)
         return feature
+
+    def get_save_train_feature(self):
+        feature = self.get_save_feature()
+
+        if 'wv_similarity' in feature_list:
+            feature = self.concatenate_feature(feature, self.wv_similarity)
+        if 'pos_bigram' in feature_list:
+            feature = self.concatenate_feature(feature, self.pos_bigram)
+        if 'word_bigram' in feature_list:
+            feature = self.concatenate_feature(feature, self.word_bigram)
+        if 'word_trigram' in feature_list:
+            feature = self.concatenate_feature(feature, self.word_trigram)
+        if 'semantic_vector_similarity' in feature_list:
+            feature = self.concatenate_feature(feature, self.semantic_vector_similarity)
+
+        return feature
+
+
 
 
     def get_test_feature(self, sentences_list, tokens_list, train_score, train_data, test_data):

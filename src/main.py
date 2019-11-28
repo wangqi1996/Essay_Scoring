@@ -15,7 +15,7 @@ from src.metrics import kappa
 import pandas as pd
 
 
-def train(contain_test=False):
+def train(contain_test=False, use_save = False):
     """ 训练模型 """
     # 1. 加载数据集
     print("start loading data_set")
@@ -41,10 +41,13 @@ def train(contain_test=False):
         feature_class = Feature.get_instance(feature)
         train_sentences_list, train_tokens_list, train_scores = Dataset.get_data_list(train_data, acquire_score=True)
 
-        train_feature = feature_class.get_train_feature(train_sentences_list, train_tokens_list, train_scores,
+        if use_save:
+            train_feature = feature_class.get_save_train_feature()
+        else:
+            train_feature = feature_class.get_train_feature(train_sentences_list, train_tokens_list, train_scores,
                                                         train_data)
+            train_dataset.save_feature(set_id, feature_class.save_feature(train_feature))
 
-        train_dataset.save_feature(set_id, feature_class.save_feature(train_feature))
         et = time.time()
         print("end compute the feature for essay set, ", set_id, "time = ", et - st)
 
@@ -99,7 +102,7 @@ def model(model_name, feature, label, set_id):
     if model_name == 'SVR':
         # SVM的回归版本
         clf = SVR(kernel='linear', C=1.0, epsilon=0.2)
-        # clf = SVR(kernel='rbf', gamma='scale', epsilon=0.2)
+        # clf = SVR(kernel='rbf', gamma='scale', C=1.0, epsilon=0.2)
         clf.fit(feature, label.ravel())
 
     print("end train model for essay set ", set_id)
@@ -111,13 +114,15 @@ if __name__ == '__main__':
     parse = argparse.ArgumentParser()
     parse.add_argument("--run", type=str, default='train', help='train or test', choices=['train', 'test'])
     parse.add_argument("--model", type=str, default='SVR', help='SVR, ', choices=['SVR'])
+    parse.add_argument("--use_save", type=bool, default=False, help='use saved feature or not')
     args = parse.parse_args()
 
     run = args.run
+    use_save = args.use_save
 
     if run == 'train':
-        train(contain_test=True)
+        train(contain_test=True, use_save= use_save)
     elif run == 'test':
-        train(contain_test=False)
+        train(contain_test=False, use_save= use_save)
     else:
         assert False, u"纳尼，居然还有这个选择能进来"
