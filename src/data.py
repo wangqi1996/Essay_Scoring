@@ -38,14 +38,14 @@ class Dataset:
 
                 self.data[str(set_id)].append(sample_dict)
 
-    def normalize_feature(self, set_id, field, max_value, min_value,normalize_dict=None):
-        if normalize_dict is None:
-            normalize_dict = self.normalize_dict
-
-        # min_value = normalize_dict[set_id][field]['min']
-        # max_value = normalize_dict[set_id][field]['max']
-        for sample in self.data[set_id]:
-            sample[field] = (sample[field] - min_value) / (max_value - min_value)
+    # def normalize_feature(self, set_id, field, max_value, min_value,normalize_dict=None):
+    #     if normalize_dict is None:
+    #         normalize_dict = self.normalize_dict
+    #
+    #     # min_value = normalize_dict[set_id][field]['min']
+    #     # max_value = normalize_dict[set_id][field]['max']
+    #     for sample in self.data[set_id]:
+    #         sample[field] = (sample[field] - min_value) / (max_value - min_value)
 
     def save_feature(self, set_id, data):
         self.feature.setdefault(str(set_id), {})
@@ -73,9 +73,6 @@ class Dataset:
                 score = essay_dict[SCORE_FIELD]
                 score_list.append(score)
 
-        sample_num = len(score_list)
-        # sentences_array = np.array(sentences_set)
-        # tokens_array = np.array(token_set)
         if acquire_score:
             scores = np.array(score_list).reshape(-1, 1)
             return sentences_set, token_set, scores

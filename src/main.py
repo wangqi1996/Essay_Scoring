@@ -1,6 +1,7 @@
 # encoding=utf-8
 import sys
 
+import numpy as np
 sys.path.append("..")
 
 import argparse
@@ -15,7 +16,7 @@ from src.metrics import kappa
 import pandas as pd
 
 
-def train(contain_test=False, use_save = False):
+def train(contain_test=False, use_save=False):
     """ 训练模型 """
     # 1. 加载数据集
     print("start loading data_set")
@@ -27,8 +28,8 @@ def train(contain_test=False, use_save = False):
     # 2. 计算特征
     essay_set_num = len(train_dataset.data)
     print(essay_set_num)
-    mean_qwk = 0
-    all_test_sample = []
+    mean_qwk = 0  # 8个指标的平均
+    all_test_sample = []  # 按照固定格式保存test
     for set_id in range(1, essay_set_num + 1):
         train_data = train_dataset.data[str(set_id)]
         dev_data = dev_dataset.data[str(set_id)]
@@ -45,7 +46,7 @@ def train(contain_test=False, use_save = False):
             train_feature = feature_class.get_save_train_feature()
         else:
             train_feature = feature_class.get_train_feature(train_sentences_list, train_tokens_list, train_scores,
-                                                        train_data)
+                                                            train_data)
             train_dataset.save_feature(set_id, feature_class.save_feature(train_feature))
 
         et = time.time()
@@ -73,7 +74,8 @@ def train(contain_test=False, use_save = False):
             test_predicted = clf.predict(test_feature)
 
         for idx, sample in enumerate(test_data):
-            sample['domain1_score'] = int(test_predicted[idx])
+            # sample['domain1_score'] = int(test_predicted[idx])
+            sample['domain1_score'] = int(np.round(float(test_predicted[idx])))
         all_test_sample.extend(test_data)
 
     save_to_tsv(all_test_sample, '../MG1933004.tsv')
@@ -121,8 +123,8 @@ if __name__ == '__main__':
     use_save = args.use_save
 
     if run == 'train':
-        train(contain_test=True, use_save= use_save)
+        train(contain_test=True, use_save=use_save)
     elif run == 'test':
-        train(contain_test=False, use_save= use_save)
+        train(contain_test=False, use_save=use_save)
     else:
         assert False, u"纳尼，居然还有这个选择能进来"
