@@ -13,9 +13,11 @@ from src.data import Dataset
 from src.feature.feature import Feature
 from src.metrics import kappa
 import pandas as pd
+import numpy as np
+from sklearn.ensemble import GradientBoostingRegressor
 
 
-def train(contain_test=False, use_save = False):
+def train(contain_test=False, use_save=False, model_name='SVR'):
     """ 训练模型 """
     # 1. 加载数据集
     print("start loading data_set")
@@ -45,7 +47,7 @@ def train(contain_test=False, use_save = False):
             train_feature = feature_class.get_save_train_feature()
         else:
             train_feature = feature_class.get_train_feature(train_sentences_list, train_tokens_list, train_scores,
-                                                        train_data)
+                                                            train_data)
             train_dataset.save_feature(set_id, feature_class.save_feature(train_feature))
 
         et = time.time()
@@ -53,7 +55,7 @@ def train(contain_test=False, use_save = False):
 
         # 3. 构建模型，训练
         # print(train_scores.shape)
-        clf = model("SVR", train_feature, train_scores, set_id)
+        clf = model(model_name, train_feature, train_scores, set_id)
 
         # 4. 测试
         dev_sentences_list, dev_tokens_list, dev_scores = Dataset.get_data_list(dev_data, acquire_score=True)
@@ -73,7 +75,8 @@ def train(contain_test=False, use_save = False):
             test_predicted = clf.predict(test_feature)
 
         for idx, sample in enumerate(test_data):
-            sample['domain1_score'] = int(test_predicted[idx])
+            # sample['domain1_score'] = int(test_predicted[idx])
+            sample['domain1_score'] = int(np.round(float(test_predicted[idx])))
         all_test_sample.extend(test_data)
 
     save_to_tsv(all_test_sample, '../MG1933004.tsv')
@@ -104,6 +107,11 @@ def model(model_name, feature, label, set_id):
         clf = SVR(kernel='linear', C=1.0, epsilon=0.2)
         # clf = SVR(kernel='rbf', gamma='scale', C=1.0, epsilon=0.2)
         clf.fit(feature, label.ravel())
+    if model_name == 'GBR':
+        print('use GBR')
+        clf = GradientBoostingRegressor(n_estimators=120, learning_rate=0.1, max_depth=1, subsample=0.55,
+                                        random_state=3, loss='huber')
+        clf.fit(feature, label.ravel())
 
     print("end train model for essay set ", set_id)
     return clf
@@ -113,16 +121,17 @@ if __name__ == '__main__':
 
     parse = argparse.ArgumentParser()
     parse.add_argument("--run", type=str, default='train', help='train or test', choices=['train', 'test'])
-    parse.add_argument("--model", type=str, default='SVR', help='SVR, ', choices=['SVR'])
+    parse.add_argument("--model", type=str, default='SVR', help='SVR, ', choices=['SVR', 'GBR'])
     parse.add_argument("--use_save", type=bool, default=False, help='use saved feature or not')
     args = parse.parse_args()
 
     run = args.run
     use_save = args.use_save
+    model_name = args.model
 
     if run == 'train':
-        train(contain_test=True, use_save= use_save)
+        train(contain_test=True, use_save=use_save, model_name = model_name)
     elif run == 'test':
-        train(contain_test=False, use_save= use_save)
+        train(contain_test=False, use_save=use_save, model_name = model_name)
     else:
         assert False, u"纳尼，居然还有这个选择能进来"

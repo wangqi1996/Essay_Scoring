@@ -49,6 +49,8 @@ class Feature:
         self.essay_length = None
         self.semantic_vector_similarity = None
 
+        self.Normalizer = None
+
         self.train_feature = None
 
     @staticmethod
@@ -266,8 +268,17 @@ class Feature:
             self.semantic_vector_similarity = semvec_sim
             feature = self.concatenate_feature(feature, semvec_sim)
 
-        # feature = preprocessing.normalize(feature, norm='l1', axis=0)
+        # normalizer = preprocessing.Normalizer(norm='max').fit(feature)
+        # feature = normalizer.transform(feature)
+
+        normalizer = preprocessing.StandardScaler().fit(feature)
+        feature = normalizer.transform(feature)
+
+        # print(normalizer)
+
+        # feature = preprocessing.normalize(feature, norm='max', axis=0)
         self.train_feature = feature
+        self.Normalizer = normalizer
 
         # print(feature)
         # print('train_feature', feature.shape)
@@ -313,7 +324,13 @@ class Feature:
             semvec_sim = semantic_vector_similarity(train_data, test_data)
             feature = self.concatenate_feature(feature, semvec_sim)
 
-        # feature = preprocessing.normalize(feature, norm='l1', axis=0)
+        # print("test_before",feature[:,1])
+
+        #feature = preprocessing.normalize(feature, norm='max', axis=0)
+
+        feature = self.Normalizer.transform(feature)
+
+        # print("test_after", feature[:,1])
 
         # print('test_feature', feature.shape)
         return feature

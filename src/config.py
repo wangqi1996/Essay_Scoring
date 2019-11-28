@@ -22,22 +22,22 @@ TOKENIZER_FIELD = 'essay_token'
 feature_list = [
 
             # "wv_similarity",
-            # "pos_bigram",
-            # "word_bigram",
-            # "word_trigram",
+            "pos_bigram",
+            "word_bigram",
+            "word_trigram",
 
             # "mean_clause_length",
             # "mean_clause_number",
 
-            "mean_word_length",
-            "var_word_length",
-            "mean_sentence_length",
-            "var_sentence_length",
+            # "mean_word_length",
+            # "var_word_length",
+            # "mean_sentence_length",
+            # "var_sentence_length",
 
 
             # "spell_error",
-            # "mean_sentence_depth",
-            # "mean_sentence_level",
+            # # "mean_sentence_depth",
+            # # "mean_sentence_level",
             "essay_length",
             # "semantic_vector_similarity",
 ]
