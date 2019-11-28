@@ -1,6 +1,8 @@
 # encoding=utf-8
 import sys
 
+from sklearn.tree import DecisionTreeClassifier
+
 sys.path.append("..")
 
 import argparse
@@ -14,8 +16,10 @@ from src.feature.feature import Feature
 from src.metrics import kappa
 import pandas as pd
 import numpy as np
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.model_selection import KFold
+
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier
+from sklearn.linear_model import BayesianRidge
+
 
 
 def train(contain_test=False, use_save=False, model_name='SVR'):
@@ -37,20 +41,22 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
         dev_data = dev_dataset.data[str(set_id)]
         test_data = test_dataset.data[str(set_id)]
 
+        feature = train_dataset.load_feature(set_id)
+        feature_class = Feature.get_instance(feature)
+        # train_data.extend(dev_data)
+        train_sentences_list, train_tokens_list, train_scores = Dataset.get_data_list(train_data,
+                                                                                      acquire_score=True)
+
         print("start compute the feature for essay set ", set_id)
         st = time.time()
 
-        feature = train_dataset.load_feature(set_id)
-        feature_class = Feature.get_instance(feature)
-        train_sentences_list, train_tokens_list, train_scores = Dataset.get_data_list(train_data, acquire_score=True)
-
         if use_save:
             print('use_save')
-            train_feature = feature_class.get_save_train_feature()
+            train_feature = feature_class.get_save_train_feature(train_sentences_list, train_tokens_list)
         else:
             train_feature = feature_class.get_train_feature(train_sentences_list, train_tokens_list, train_scores,
                                                             train_data)
-            train_dataset.save_feature(set_id, feature_class.save_feature(train_feature))
+        train_dataset.save_feature(set_id, feature_class.save_feature(train_feature))
 
         et = time.time()
         print("end compute the feature for essay set, ", set_id, "time = ", et - st)
@@ -131,14 +137,30 @@ def model(model_name, feature, label, set_id):
     clf = None
     if model_name == 'SVR':
         # SVM的回归版本
-        clf = SVR(kernel='linear', C=1.0, epsilon=0.2)
-        # clf = SVR(kernel='rbf', gamma='scale', C=1.0, epsilon=0.2)
+        # clf = SVR(kernel='linear', C=1.0, epsilon=0.2)
+        clf = SVR(kernel='rbf', gamma='scale', C=1.0, epsilon=0.2)
         clf.fit(feature, label.ravel())
     if model_name == 'GBR':
         print('use GBR')
         clf = GradientBoostingRegressor(n_estimators=120, learning_rate=0.1, max_depth=1, subsample=0.55,
                                         random_state=3, loss='huber')
         clf.fit(feature, label.ravel())
+
+    if model_name == 'decision_tree':
+        clf = DecisionTreeClassifier(random_state=1024)
+        clf.fit(feature, label)
+
+    if model_name == 'random_forest':
+        clf = RandomForestClassifier(n_estimators=100,
+                                     bootstrap=True,
+                                     max_features='sqrt')
+        # Fit on training data
+        clf.fit(feature, label)
+
+    if model_name == 'ling':
+        # 岭回归
+        clf = BayesianRidge()
+        clf.fit(feature, label)
 
     print("end train model for essay set ", set_id)
     return clf
@@ -148,7 +170,7 @@ if __name__ == '__main__':
 
     parse = argparse.ArgumentParser()
     parse.add_argument("--run", type=str, default='train', help='train or test', choices=['train', 'test'])
-    parse.add_argument("--model", type=str, default='SVR', help='SVR, ', choices=['SVR', 'GBR'])
+    parse.add_argument("--model", type=str, default='GBR', help='SVR, ', choices=['SVR', 'GBR'])
     parse.add_argument("--use_save", type=bool, default=False, help='use saved feature or not')
     args = parse.parse_args()
 

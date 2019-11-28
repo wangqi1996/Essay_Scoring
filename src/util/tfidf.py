@@ -120,7 +120,7 @@ def tfTF_train(data,word_ngram=False):
     if word_ngram:
         vectorizer = CountVectorizer(max_features=1000)
     else:
-        vectorizer = CountVectorizer()
+        vectorizer = CountVectorizer(max_features=250)
     train_tf = vectorizer.fit_transform(data).toarray()
     TF = np.sum(train_tf, 0)
 

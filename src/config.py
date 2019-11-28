@@ -34,8 +34,14 @@ feature_list = [
     "var_sentence_length",
     #
     "spell_error",
-    # "mean_sentence_depth",
-    # "mean_sentence_level",
+    # # "mean_sentence_depth",
+    # # "mean_sentence_level",
     "essay_length",
-    # "semantic_vector_similarity",
+
+    "semantic_vector_similarity",
+    "current_pos",
+    "error_pos",
+    "current_pos3",
+    "error_pos3",
+    "vocab_size",
 ]

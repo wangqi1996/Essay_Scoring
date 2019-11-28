@@ -4,7 +4,7 @@ import numpy as np
 from src.config import feature_list
 from src.feature.iku import spell_error, Mean_sentence_depth_level, essay_length, semantic_vector_similarity
 from src.feature.wangdq import word_vector_similarity_train, word_vector_similarity_test, \
-    mean_clause, pos_gram_train, pos_gram_test
+    mean_clause, pos_gram_train, pos_gram_test, good_pos_ngrams, vocab_size
 from src.feature.xiaoyl import word_length, get_sentence_length, word_bigram_train, word_bigram_test, \
     word_trigram_train, \
     word_trigram_test, bag_of_words_train, bag_of_words_test
@@ -60,6 +60,12 @@ class Feature:
 
         self.train_feature = None
 
+        self.current_pos = None
+        self.error_pos = None
+        self.current_pos3 = None
+        self.error_pos3 = None
+        self.vocab_size = None
+
     @staticmethod
     def get_instance(feature):
         """ 从dataset中构建dataset
@@ -105,6 +111,13 @@ class Feature:
         feature_class.essay_length = feature.get('essay_length', None)
         feature_class.semantic_vector_similarity = feature.get('semantic_vector_similarity', None)
 
+        feature_class.error_pos = feature.get('error_pos', None)
+        feature_class.current_pos = feature.get('current_pos', None)
+
+        feature_class.error_pos3 = feature.get('error_pos3', None)
+        feature_class.current_pos3 = feature.get('current_pos3', None)
+
+        feature_class.vocab_size = feature.get('vocab_size', None)
         # 一个array数组
         feature_class.train_feature = feature.get('train_feature', None)
         return feature_class
@@ -147,6 +160,11 @@ class Feature:
             "essay_length": self.essay_length,
             "semantic_vector_similarity": self.semantic_vector_similarity,
 
+            "current_pos": self.current_pos,
+            "error_pos": self.error_pos,
+            "current_pos3": self.current_pos3,
+            "error_pos3": self.error_pos3,
+            'vocab_size': self.vocab_size,
             "train_feature": train_feature
         }
 
@@ -156,6 +174,8 @@ class Feature:
         return np.concatenate(feature, axis=1)
 
     def concatenate_feature(self, feature, new_feature):
+        if new_feature is None:
+            return feature
         if feature is None:
             return new_feature
         else:
@@ -214,9 +234,24 @@ class Feature:
         # feature = self.append_feature(mean_clause_length, mean_clause_number, mean_word_length, var_word_length,
         #                               mean_sentence_length, var_sentence_length)
 
+        if "current_pos" in feature_list:
+            self.current_pos, self.error_pos = good_pos_ngrams(token_set, gram=2)
+            feature = self.concatenate_feature(feature, self.current_pos)
+            feature = self.concatenate_feature(feature, self.error_pos)
+
+        if "current_pos3" in feature_list:
+            self.current_pos3, self.error_pos3 = good_pos_ngrams(token_set, gram=3)
+            feature = self.concatenate_feature(feature, self.current_pos3)
+            feature = self.concatenate_feature(feature, self.error_pos3)
+
+        if 'vocab_size' in feature_list:
+            self.vocab_size = vocab_size(token_set)
+            feature = self.concatenate_feature(feature, self.vocab_size)
+
         return feature
 
     def get_save_feature(self):
+
         feature = None
         if 'mean_clause_length' in feature_list:
             feature = self.concatenate_feature(feature, self.mean_clause_length)
@@ -244,6 +279,21 @@ class Feature:
         if 'essay_length' in feature_list:
             feature = self.concatenate_feature(feature, self.essay_length)
 
+        if 'current_pos' in feature_list:
+            feature = self.concatenate_feature(feature, self.current_pos)
+
+        if 'error_pos' in feature_list:
+            feature = self.concatenate_feature(feature, self.error_pos)
+
+        if 'current_pos3' in feature_list:
+            feature = self.concatenate_feature(feature, self.current_pos3)
+
+        if 'error_pos3' in feature_list:
+            feature = self.concatenate_feature(feature, self.error_pos3)
+
+        if 'vocab_size' in feature_list:
+            feature = self.concatenate_feature(feature, self.vocab_size)
+
         return feature
 
     def get_train_feature(self, sentences_list, tokens_list, scores, train_data):
@@ -251,13 +301,12 @@ class Feature:
         sentences_array, tokens_array 均已经tokenizer处理过
         所有返回的特征的维度: ndarray类型 sample_num * feature_dim
         """
-
+        #
         # if self.train_feature is not None:
         #     return self.train_feature
 
         feature = self.get_feature(sentences_list, tokens_list, train_data)
 
-        # feature = self.append_feature(feature, wv_similarity, pos_bigram)
         if 'wv_similarity' in feature_list:
             wv_similarity, wv_tf_vocab, wv_idf_diag, wv_tfidf = word_vector_similarity_train(tokens_list, scores)
             self.wv_similarity = wv_similarity
@@ -306,9 +355,6 @@ class Feature:
             self.bag_of_words_TF = bag_of_words_TF
             feature = self.concatenate_feature(feature, word_trigram)
 
-        # normalizer = preprocessing.Normalizer(norm='max').fit(feature)
-        # feature = normalizer.transform(feature)
-
         normalizer = preprocessing.StandardScaler().fit(feature)
         feature = normalizer.transform(feature)
 
@@ -322,7 +368,7 @@ class Feature:
         # print('train_feature', feature.shape)
         return feature
 
-    def get_save_train_feature(self):
+    def get_save_train_feature(self, sentences_list, tokens_list):
         print("use_save")
         feature = self.get_save_feature()
 
@@ -333,11 +379,25 @@ class Feature:
         if 'pos_trigram' in feature_list:
             feature = self.concatenate_feature(feature, self.pos_trigram)
         if 'word_bigram' in feature_list:
+            pos_bigram, pos_2TF, pos_2tf_vocab = pos_gram_train(tokens_list, 2)
+            self.pos_bigram = pos_bigram
+            self.pos_2tf_vocab = pos_2tf_vocab
+            self.pos_2TF = pos_2TF
+            self.word_bigram = pos_bigram
             feature = self.concatenate_feature(feature, self.word_bigram)
         if 'word_trigram' in feature_list:
             feature = self.concatenate_feature(feature, self.word_trigram)
         if 'semantic_vector_similarity' in feature_list:
             feature = self.concatenate_feature(feature, self.semantic_vector_similarity)
+
+        # if 'mean_sentence_length' in feature_list or 'var_sentence_length' in feature_list:
+        #     mean_sentence_length, var_sentence_length = get_sentence_length(sentences_list)
+        #     self.mean_sentence_length = mean_sentence_length
+        #     self.var_sentence_length = var_sentence_length
+        #     if 'mean_sentence_length' in feature_list:
+        #         feature = self.concatenate_feature(feature, mean_sentence_length)
+        #     if 'var_sentence_length' in feature_list:
+        #         feature = self.concatenate_feature(feature, var_sentence_length)
 
         normalizer = preprocessing.StandardScaler().fit(feature)
         feature = normalizer.transform(feature)
@@ -350,8 +410,8 @@ class Feature:
     def get_test_feature(self, sentences_list, tokens_list, train_score, train_data, test_data):
         """ """
         feature = self.get_feature(sentences_list, tokens_list, test_data)
-        #####################
-        # feature = self.append_feature(feature, wv_similarity, pos_bigram, word_bigram, word_trigram)
+        # #####################
+        # # feature = self.append_feature(feature, wv_similarity, pos_bigram, word_bigram, word_trigram)
         if 'wv_similarity' in feature_list:
             wv_similarity = word_vector_similarity_test(tokens_list, train_score, self.wv_tf_vocab, self.wv_idf_diag,
                                                         self.wv_tfidf)
@@ -383,8 +443,9 @@ class Feature:
 
         # print("test_before",feature[:,1])
 
-        #feature = preprocessing.normalize(feature, norm='max', axis=0)
-
+        # feature = preprocessing.normalize(feature, norm='max', axis=0)
+        # add_feature = self.get_add_feature(sentences_list, tokens_list)
+        # feature = self.concatenate_feature(feature, add_feature)
         feature = self.Normalizer.transform(feature)
 
         # print("test_after", feature[:,1])
