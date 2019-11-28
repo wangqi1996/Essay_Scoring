@@ -158,7 +158,7 @@ def semantic_vector_similarity(dataset, test_data):
     dictionary = corpora.Dictionary(token_sets)
 
     corpus = [dictionary.doc2bow(tokens) for tokens in token_sets]
-    lsi_model = models.LsiModel(corpus, id2word=dictionary, num_topics=2)
+    lsi_model = models.LsiModel(corpus, id2word=dictionary, num_topics=20)
     documents = lsi_model[corpus]
     topics = lsi_model.show_topics(num_words=5, log=0)
 

@@ -112,3 +112,6 @@ data/
 **/.DS_Store
 **/__pycache__
 **/__pycache__/
+
+MG1933004.tsv
+src/config.py

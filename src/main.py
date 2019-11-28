@@ -15,6 +15,7 @@ from src.metrics import kappa
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.model_selection import KFold
 
 
 def train(contain_test=False, use_save=False, model_name='SVR'):
@@ -44,6 +45,7 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
         train_sentences_list, train_tokens_list, train_scores = Dataset.get_data_list(train_data, acquire_score=True)
 
         if use_save:
+            print('use_save')
             train_feature = feature_class.get_save_train_feature()
         else:
             train_feature = feature_class.get_train_feature(train_sentences_list, train_tokens_list, train_scores,
@@ -53,20 +55,45 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
         et = time.time()
         print("end compute the feature for essay set, ", set_id, "time = ", et - st)
 
+        dev_sentences_list, dev_tokens_list, dev_scores = Dataset.get_data_list(dev_data, acquire_score=True)
+        dev_feature = feature_class.get_test_feature(dev_sentences_list, dev_tokens_list, train_scores, train_data,
+                                                     dev_data)
+        x = np.concatenate((train_feature, dev_feature), axis=0)
+        y = np.concatenate((train_scores, dev_scores), axis=0)
+
         # 3. 构建模型，训练
         # print(train_scores.shape)
         clf = model(model_name, train_feature, train_scores, set_id)
 
         # 4. 测试
-        dev_sentences_list, dev_tokens_list, dev_scores = Dataset.get_data_list(dev_data, acquire_score=True)
-        dev_feature = feature_class.get_test_feature(dev_sentences_list, dev_tokens_list, train_scores, train_data,
-                                                     dev_data)
-
+        # dev_sentences_list, dev_tokens_list, dev_scores = Dataset.get_data_list(dev_data, acquire_score=True)
+        # dev_feature = feature_class.get_test_feature(dev_sentences_list, dev_tokens_list, train_scores, train_data,
+        #                                              dev_data)
         print('dev ends')
         predicted = clf.predict(dev_feature)
         qwk = kappa(dev_scores, predicted, weights='quadratic')
         print(set_id, qwk)
         mean_qwk += qwk
+
+        # 交叉验证
+        # kf = KFold(n_splits=20, random_state=0)
+        #
+        # x = np.concatenate((train_feature, dev_feature), axis=0)
+        # y = np.concatenate((train_scores, dev_scores), axis=0)
+        #
+        # dev_predict_list = []
+        # model_list = []
+        # test_list = []
+        # dev_result_list = []
+        #
+        # for train_index, test_index in kf.split(x):
+        #     x_train, x_test = x[train_index], x[test_index]
+        #     y_train, y_test = y[train_index], y[test_index]
+        #
+        #     reg = model(model_name, x_train, y_train, set_id)
+        #
+        #     model_list.append(reg)
+        #     predict_dev_y = reg.predict()
 
         if contain_test:
             test_sentences_list, test_tokens_list = Dataset.get_data_list(test_data, acquire_score=False)
@@ -130,8 +157,8 @@ if __name__ == '__main__':
     model_name = args.model
 
     if run == 'train':
-        train(contain_test=True, use_save=use_save, model_name = model_name)
+        train(contain_test=True, use_save=use_save, model_name=model_name)
     elif run == 'test':
-        train(contain_test=False, use_save=use_save, model_name = model_name)
+        train(contain_test=False, use_save=use_save, model_name=model_name)
     else:
         assert False, u"纳尼，居然还有这个选择能进来"

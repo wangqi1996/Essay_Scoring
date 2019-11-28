@@ -13,6 +13,7 @@ class Dataset:
         self.data = {}
         self.normalize_dict = {}
         self.feature = {}  # 存储feature和中间变量
+        self.test_feature = {}
 
     def load_from_raw_file(self, filename, field_require):
         tokenizer = spacy.load("en_core_web_sm")
@@ -51,8 +52,15 @@ class Dataset:
         self.feature.setdefault(str(set_id), {})
         self.feature[str(set_id)].update(data)
 
+    def save_test_feature(self, set_id, data):
+        self.test_feature.setdefault(str(set_id), {})
+        self.test_feature[str(set_id)].update(data)
+
     def load_feature(self, set_id):
         return self.feature.get(str(set_id), {})
+
+    def load_test_feature(self, set_id):
+        return self.test_feature.get(str(set_id), {})
 
     @staticmethod
     def get_data_list(data, acquire_score):
