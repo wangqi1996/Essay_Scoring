@@ -113,5 +113,5 @@ data/
 **/__pycache__
 **/__pycache__/
 
-MG1933004.tsv
-src/config.py
+/MG1933004.tsv
+/src/config.py
