@@ -2,6 +2,7 @@
 
 import unittest
 
+from feature.wangdq import good_pos_ngrams, vocab_size
 from feature.xiaoyl import word_length, get_sentence_length
 from src.util.tfidf import process_tfidf_data, tfidf_train, tfidf_test
 from src.util.util import word_stemming_remove_stop, tokenizer, pos_tagging, ngram, constituency_tree, get_sentences
@@ -167,15 +168,35 @@ class TestUtil(unittest.TestCase):
         result = get_sentence_length(corpus)
         print(result)
 
-        print(mean_word_length(corpus))
+    def test_good_pos_ngrams(self):
+        corpus = [
+            'This is the first document. the a',
+            'This is the second seconds document.',
+            'And the third one. fying',
+            'Is this the first documents?',
+            'a a a a'
+        ]
 
-        print(variance_word_length(corpus))
+        corpus = tokenizer(corpus)
+        print(corpus)
 
-        print(mean_sentence_length(corpus))
-
-        print(variance_sentence_length(corpus))
-
+        data = good_pos_ngrams(corpus)
+        print(data)
 
 
+    def test_vocab_size(self):
+        corpus = [
+            'This is the first document. the a',
+            'This is the second seconds document.',
+            'And the third one. fying',
+            'Is this the first documents?',
+            'a  a a a'
+        ]
+
+        corpus = tokenizer(corpus)
+        print(corpus)
+
+        result = vocab_size(corpus)
+        print(result)
 if __name__ == '__main__':
     TestUtil().test_pos_tag()

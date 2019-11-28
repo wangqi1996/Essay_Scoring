@@ -1,9 +1,13 @@
 # encoding=utf-8
+import os
+import pickle
 
 import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer
 
 from src.util.tfidf import process_tfidf_data, tfidf_train, tfidf_test, tfTF_train, tfTF_test
 from src.util.util import matrix_cosine_similarity, pos_tagging, ngram, constituency_tree
+from sklearn.linear_model import BayesianRidge
 
 """
 输入分为两种： sequence or  tokens
@@ -111,3 +115,50 @@ def mean_clause(data):
 
     sample_num = len(data)
     return mean_clause_length.reshape(sample_num, 1), mean_clause_num.reshape(sample_num, 1)
+
+
+NGRAM_PATH = "../../data/good_pos_ngrams.p"
+
+
+def good_pos_ngrams(data, gram=2):
+    """
+    input: tokens
+    """
+    if (os.path.isfile(NGRAM_PATH)):
+        good_pos_ngrams = pickle.load(open(NGRAM_PATH, 'rb'))
+    else:
+        good_pos_ngrams = ['NN PRP', 'NN PRP .', 'NN PRP . DT', 'PRP .', 'PRP . DT', 'PRP . DT NNP', '. DT',
+                           '. DT NNP', '. DT NNP NNP', 'DT NNP', 'DT NNP NNP', 'DT NNP NNP NNP', 'NNP NNP',
+                           'NNP NNP NNP', 'NNP NNP NNP NNP', 'NNP NNP NNP .', 'NNP NNP .', 'NNP NNP . TO',
+                           'NNP .', 'NNP . TO', 'NNP . TO NNP', '. TO', '. TO NNP', '. TO NNP NNP',
+                           'TO NNP', 'TO NNP NNP']
+
+    tagged_data = pos_tagging(data)
+
+    # 2. 组成2-gram
+    gramed_data = ngram(tagged_data, gram, join_char=' ')
+
+    correct_result = []
+    uncorrect_result = []
+    for essay in gramed_data:
+        correct = 0
+        uncorrect = 0
+        for gram in essay:
+            if gram in good_pos_ngrams:
+                correct += 1
+            else:
+                uncorrect += 1
+
+        correct_result.append(correct)
+        uncorrect_result.append(uncorrect)
+    return np.array(correct_result).reshape(-1, 1), np.array(uncorrect_result).reshape(-1, 1)
+
+
+def vocab_size(data):
+    """ input: tokens"""
+
+    result = []
+    for essay in data:
+        result.append(len(set(essay)))
+
+    return np.array(result).reshape(-1, 1)
