@@ -13,6 +13,8 @@ from src.util.util import matrix_cosine_similarity, pos_tagging, ngram, constitu
 def word_vector_similarity_train(train_data, scores):
     """ input: tokens (已经tokenizer的)"""
 
+    print("word_vector_similarity_train")
+
     sample_num = scores.shape[0]
 
     train_data = process_tfidf_data(train_data)
@@ -24,7 +26,7 @@ def word_vector_similarity_train(train_data, scores):
     np.fill_diagonal(attn, 0)
     sum_attn = np.sum(attn, 1)
     result = sum_attn / (sample_num - 1)
-    return result.reshape(sample_num, 1), tf_vocab, idf_diag
+    return result.reshape(sample_num, 1), tf_vocab, idf_diag, tfidf
 
 
 def word_vector_similarity_test(test_data, train_score_list, tf_vocab, idf_diag):
@@ -32,6 +34,8 @@ def word_vector_similarity_test(test_data, train_score_list, tf_vocab, idf_diag)
 
     assert idf_diag is not None, u"测试阶段，idf_diag不能为None"
     assert tf_vocab is not None, u"测试阶段，tf_vocab不能为None"
+
+    print("word_vector_similarity_test")
 
     sample_num = train_score_list.shape[0]
 
@@ -50,6 +54,8 @@ def word_vector_similarity_test(test_data, train_score_list, tf_vocab, idf_diag)
 def pos_bigram_train(train_data):
     """ input: tokens"""
 
+    print("pos_bigram_train")
+
     # 1. 词性标注
     tagged_data = pos_tagging(train_data)
 
@@ -65,6 +71,8 @@ def pos_bigram_train(train_data):
 
 def pos_bigram_test(test_data, TF, tf_vocab):
     """ input: tokens (已经tokenizer的)"""
+
+    print("pos_bigram_test")
 
     assert TF is not None, u"测试阶段，TF不能为None"
     assert tf_vocab is not None, u"测试阶段，tf_vocab不能为None"
@@ -86,6 +94,8 @@ def mean_clause(data):
     train test使用 input: sentences
     """
     assert data is not None, u"data不能为none"
+
+    print("mean_clause")
 
     clause_lengths, clause_nums, sentences_num = constituency_tree(data)
 

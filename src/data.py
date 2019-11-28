@@ -38,12 +38,12 @@ class Dataset:
 
                 self.data[str(set_id)].append(sample_dict)
 
-    def normalize_feature(self, set_id, field, normalize_dict=None):
+    def normalize_feature(self, set_id, field, max_value, min_value,normalize_dict=None):
         if normalize_dict is None:
             normalize_dict = self.normalize_dict
 
-        min_value = normalize_dict[set_id][field]['min']
-        max_value = normalize_dict[set_id][field]['max']
+        # min_value = normalize_dict[set_id][field]['min']
+        # max_value = normalize_dict[set_id][field]['max']
         for sample in self.data[set_id]:
             sample[field] = (sample[field] - min_value) / (max_value - min_value)
 
@@ -55,9 +55,9 @@ class Dataset:
         return self.feature.get(str(set_id), {})
 
     @staticmethod
-    def get_data_list(data, acquire_score=True):
+    def get_data_list(data, acquire_score):
         """ 根据eaasy_id获取tokenizer后的data和label """
-        essay_list = data[:10]
+        essay_list = data
 
         sentences_set = []
         token_set = []
@@ -65,19 +65,22 @@ class Dataset:
 
         for essay_dict in essay_list:
             essay = essay_dict[TOKENIZER_FIELD]
-            score = essay_dict[SCORE_FIELD]
+
             token_set.append(essay)
             sentences_set.append(' '.join(essay))
             # test data没有score这个key
             if acquire_score:
+                score = essay_dict[SCORE_FIELD]
                 score_list.append(score)
 
         sample_num = len(score_list)
         # sentences_array = np.array(sentences_set)
         # tokens_array = np.array(token_set)
-        scores = np.array(score_list).reshape(sample_num, 1)
-
-        return sentences_set, token_set, scores
+        if acquire_score:
+            scores = np.array(score_list).reshape(-1, 1)
+            return sentences_set, token_set, scores
+        else:
+            return sentences_set, token_set
 
     @staticmethod
     def save(dataset, path):

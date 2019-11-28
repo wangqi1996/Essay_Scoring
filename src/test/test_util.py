@@ -2,8 +2,7 @@
 
 import unittest
 
-from feature.xiaoyl import word_length, get_sentence_length, mean_word_length, variance_word_length, \
-    mean_sentence_length, variance_sentence_length
+from feature.xiaoyl import word_length, get_sentence_length
 from src.util.tfidf import process_tfidf_data, tfidf_train, tfidf_test
 from src.util.util import word_stemming_remove_stop, tokenizer, pos_tagging, ngram, constituency_tree, get_sentences
 
@@ -54,6 +53,7 @@ class TestUtil(unittest.TestCase):
             'And the third one.',
             'Is this the first document?'
         ]
+        corpus = tokenizer(corpus)
         corpus = process_tfidf_data(corpus)
         print(corpus)
 
@@ -174,3 +174,8 @@ class TestUtil(unittest.TestCase):
         print(mean_sentence_length(corpus))
 
         print(variance_sentence_length(corpus))
+
+
+
+if __name__ == '__main__':
+    TestUtil().test_pos_tag()

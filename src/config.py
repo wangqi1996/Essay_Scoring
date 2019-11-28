@@ -1,7 +1,7 @@
 # encoding=utf-8
 
 
-STANFORDCORENLP_PATH=r'E:\code\nlp_homeword\Essay_Scoring\lib\stanford-corenlp-full-2018-10-05'
+STANFORDCORENLP_PATH=r'/Users/ikuc/stanfordnlp_resources/stanford-corenlp-full-2016-10-31'
 
 TRAIN_DADA_PATH = r'../data/train.pickle'
 TEST_DATA_PATH = r'../data/test.pickle'
@@ -18,3 +18,30 @@ ESSAY_ID_FIELD = 'essay_id'
 ESSAY_FIELD = 'essay'
 SCORE_FIELD = 'domain1_score'
 TOKENIZER_FIELD = 'essay_token'
+
+feature_list = [
+            #
+            "wv_similarity",
+            "pos_bigram",
+            # "word_bigram",
+            # "word_trigram",
+
+            "mean_clause_length",
+            "mean_clause_number",
+
+            "mean_word_length",
+            "var_word_length",
+            "mean_sentence_length",
+            "var_sentence_length",
+
+            "word_bigram_tf_vocab",
+            "word_bigram_TF",
+            "word_trigram_tf_vocab",
+            "word_trigram_TF",
+
+            "spell_error",
+            "mean_sentence_depth",
+            "mean_sentence_level",
+            "essay_length",
+            "semantic_vector_similarity",
+]
