@@ -1,4 +1,5 @@
 # encoding=utf-8
+import copy
 import sys
 
 from sklearn.tree import DecisionTreeClassifier
@@ -43,7 +44,9 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
 
         feature = train_dataset.load_feature(set_id)
         feature_class = Feature.get_instance(feature)
-        # train_data.extend(dev_data)
+        # new_train_data = copy.deepcopy(train_data)
+        # new_train_data.extend(dev_data)
+        # train_data = new_train_data
         train_sentences_list, train_tokens_list, train_scores = Dataset.get_data_list(train_data,
                                                                                       acquire_score=True)
 
@@ -56,7 +59,7 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
         else:
             train_feature = feature_class.get_train_feature(train_sentences_list, train_tokens_list, train_scores,
                                                             train_data)
-        train_dataset.save_feature(set_id, feature_class.save_feature(train_feature))
+            train_dataset.save_feature(set_id, feature_class.save_feature(train_feature))
 
         et = time.time()
         print("end compute the feature for essay set, ", set_id, "time = ", et - st)
@@ -171,7 +174,7 @@ if __name__ == '__main__':
     parse = argparse.ArgumentParser()
     parse.add_argument("--run", type=str, default='train', help='train or test', choices=['train', 'test'])
     parse.add_argument("--model", type=str, default='GBR', help='SVR, ', choices=['SVR', 'GBR'])
-    parse.add_argument("--use_save", type=bool, default=False, help='use saved feature or not')
+    parse.add_argument("--use_save", type=bool, default=True, help='use saved feature or not')
     args = parse.parse_args()
 
     run = args.run

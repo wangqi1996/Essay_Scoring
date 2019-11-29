@@ -379,25 +379,11 @@ class Feature:
         if 'pos_trigram' in feature_list:
             feature = self.concatenate_feature(feature, self.pos_trigram)
         if 'word_bigram' in feature_list:
-            pos_bigram, pos_2TF, pos_2tf_vocab = pos_gram_train(tokens_list, 2)
-            self.pos_bigram = pos_bigram
-            self.pos_2tf_vocab = pos_2tf_vocab
-            self.pos_2TF = pos_2TF
-            self.word_bigram = pos_bigram
             feature = self.concatenate_feature(feature, self.word_bigram)
         if 'word_trigram' in feature_list:
             feature = self.concatenate_feature(feature, self.word_trigram)
         if 'semantic_vector_similarity' in feature_list:
             feature = self.concatenate_feature(feature, self.semantic_vector_similarity)
-
-        # if 'mean_sentence_length' in feature_list or 'var_sentence_length' in feature_list:
-        #     mean_sentence_length, var_sentence_length = get_sentence_length(sentences_list)
-        #     self.mean_sentence_length = mean_sentence_length
-        #     self.var_sentence_length = var_sentence_length
-        #     if 'mean_sentence_length' in feature_list:
-        #         feature = self.concatenate_feature(feature, mean_sentence_length)
-        #     if 'var_sentence_length' in feature_list:
-        #         feature = self.concatenate_feature(feature, var_sentence_length)
 
         normalizer = preprocessing.StandardScaler().fit(feature)
         feature = normalizer.transform(feature)

@@ -38,7 +38,7 @@ feature_list = [
     # # "mean_sentence_level",
     "essay_length",
 
-    "semantic_vector_similarity",
+    # "semantic_vector_similarity",
     "current_pos",
     "error_pos",
     "current_pos3",

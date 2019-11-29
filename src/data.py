@@ -100,19 +100,19 @@ class Dataset:
 
 # load_from_raw_file includes tokenize process, which is time consuming
 #
-# train_dataset = Dataset()
-# train_dataset.load_from_raw_file('../data/train.tsv', ['essay_set', 'essay_id', 'essay', 'domain1_score'])
-# Dataset.save(train_dataset, '../data/train.pickle')
-# # #
-# dev_dataset = Dataset()
-# dev_dataset.load_from_raw_file('../data/dev.tsv', ['essay_set', 'essay_id', 'essay', 'domain1_score'])
-# Dataset.save(dev_dataset, '../data/dev.pickle')
-# # #
+train_dataset = Dataset()
+train_dataset.load_from_raw_file('../data/train.tsv', ['essay_set', 'essay_id', 'essay', 'domain1_score'])
+Dataset.save(train_dataset, '../data/train.pickle')
+# #
+dev_dataset = Dataset()
+dev_dataset.load_from_raw_file('../data/dev.tsv', ['essay_set', 'essay_id', 'essay', 'domain1_score'])
+Dataset.save(dev_dataset, '../data/dev.pickle')
+# #
 # #
 #
-# test_dataset = Dataset()
-# test_dataset.load_from_raw_file('../data/test.tsv', ['essay_set', 'essay_id', 'essay'])
-# Dataset.save(test_dataset, '../data/test.pickle')
+test_dataset = Dataset()
+test_dataset.load_from_raw_file('../data/test.tsv', ['essay_set', 'essay_id', 'essay'])
+Dataset.save(test_dataset, '../data/test.pickle')
 
 # train_dataset = Dataset.load("../data/essay_data/train.pickle")
 # dev_dataset = Dataset.load("../data/essay_data/dev.pickle")
