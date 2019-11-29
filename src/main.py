@@ -1,6 +1,7 @@
 # encoding=utf-8
 import copy
 import sys
+import os
 
 from sklearn.tree import DecisionTreeClassifier
 
@@ -11,7 +12,7 @@ import time
 
 from sklearn.svm import SVR
 
-from src.config import TRAIN_DADA_PATH, DEV_DATA_PATH, TEST_DATA_PATH
+from src.config import TRAIN_DADA_PATH, DEV_DATA_PATH, TEST_DATA_PATH,feature_list
 from src.data import Dataset
 from src.feature.feature import Feature
 from src.metrics import kappa
@@ -20,6 +21,8 @@ import numpy as np
 
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier
 from sklearn.linear_model import BayesianRidge
+
+import config
 
 
 
@@ -37,6 +40,9 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
     print(essay_set_num)
     mean_qwk = 0
     all_test_sample = []
+    qwk_score_list = []
+    use_dev = ''
+
     for set_id in range(1, essay_set_num + 1):
         train_data = train_dataset.data[str(set_id)]
         dev_data = dev_dataset.data[str(set_id)]
@@ -71,8 +77,10 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
         y = np.concatenate((train_scores, dev_scores), axis=0)
 
         # 3. 构建模型，训练
-        # print(train_scores.shape)
+        use_dev = 'No' #手动修改
         clf = model(model_name, train_feature, train_scores, set_id)
+        # 加dev集训练
+        # clf = model(model_name, x, y, set_id)
 
         # 4. 测试
         # dev_sentences_list, dev_tokens_list, dev_scores = Dataset.get_data_list(dev_data, acquire_score=True)
@@ -81,6 +89,7 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
         print('dev ends')
         predicted = clf.predict(dev_feature)
         qwk = kappa(dev_scores, predicted, weights='quadratic')
+        qwk_score_list.append(qwk)
         print(set_id, qwk)
         mean_qwk += qwk
 
@@ -116,7 +125,9 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
         all_test_sample.extend(test_data)
 
     save_to_tsv(all_test_sample, '../MG1933004.tsv')
-    print(mean_qwk / essay_set_num)
+    mean_qwk = mean_qwk / essay_set_num
+    print(mean_qwk)
+    save_info_to_file(feature_list, use_dev, qwk_score_list, mean_qwk)
 
     # break
     # 保存特征 只能保存dataset对象了
@@ -131,6 +142,25 @@ def save_to_tsv(samples: list, tsv_file):
     }
     df = pd.DataFrame(raw_data)
     df.to_csv(tsv_file, sep='\t', index=False, header=False)
+
+
+def save_info_to_file(feature_list, use_dev, score_list, mean_qwk):
+    if not os.path.exists('../res'):
+        os.makedirs('../res')
+    filename = '../res/' + str(mean_qwk) + '.txt'
+    with open(filename, 'w', encoding='utf-8') as file:
+        file.writelines('feature:\n')
+        for feature in feature_list:
+            file.writelines(feature+'\n')
+        file.writelines('\n')
+        file.writelines('use_dev:'+use_dev+'\n')
+        for idx,score in enumerate(score_list):
+            file.writelines('dev '+str(idx+1)+': '+str(score)+'\n')
+        file.writelines('\n')
+        file.writelines('mean_qwk: '+str(mean_qwk)+'\n')
+        file.writelines('pos2gram_dim:'+str(config.pos2gram_dim)+'\n')
+        file.writelines('pos3gram_dim:'+str(config.pos3gram_dim)+'\n')
+        file.writelines('word_gram_dim:'+str(config.word_gram_dim)+'\n')
 
 
 def model(model_name, feature, label, set_id):
@@ -174,7 +204,7 @@ if __name__ == '__main__':
     parse = argparse.ArgumentParser()
     parse.add_argument("--run", type=str, default='train', help='train or test', choices=['train', 'test'])
     parse.add_argument("--model", type=str, default='GBR', help='SVR, ', choices=['SVR', 'GBR'])
-    parse.add_argument("--use_save", type=bool, default=True, help='use saved feature or not')
+    parse.add_argument("--use_save", type=bool, default=False, help='use saved feature or not')
     args = parse.parse_args()
 
     run = args.run
