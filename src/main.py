@@ -18,13 +18,15 @@ from src.feature.feature import Feature
 from src.metrics import kappa
 import pandas as pd
 import numpy as np
+
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier
 from sklearn.linear_model import BayesianRidge
 
 import config
 
 
-def train(use_save=False, model_name='SVR'):
+
+def train(contain_test=False, use_save=False, model_name='SVR'):
     """ 训练模型 """
     # 1. 加载数据集
     print("start loading data_set")
@@ -72,6 +74,12 @@ def train(use_save=False, model_name='SVR'):
 
         et = time.time()
         print("end compute the feature for essay set, ", set_id, "time = ", et - st)
+
+        dev_sentences_list, dev_tokens_list, dev_scores = Dataset.get_data_list(dev_data, acquire_score=True)
+        dev_feature = feature_class.get_test_feature(dev_sentences_list, dev_tokens_list, train_scores, train_data,
+                                                     dev_data)
+        x = np.concatenate((train_feature, dev_feature), axis=0)
+        y = np.concatenate((train_scores, dev_scores), axis=0)
 
         # 3. 构建模型，训练
         use_dev = 'No' #手动修改

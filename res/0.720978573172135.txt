@@ -1,0 +1,27 @@
+feature:
+wv_similarity
+pos_bigram
+pos_trigram
+word_bigram
+word_trigram
+mean_word_length
+var_word_length
+mean_sentence_length
+var_sentence_length
+spell_error
+essay_length
+
+use_dev:No
+dev 1: 0.8370607403698328
+dev 2: 0.6876110306376233
+dev 3: 0.6886617100371748
+dev 4: 0.684409654272668
+dev 5: 0.7830831278331386
+dev 6: 0.736842105263158
+dev 7: 0.7363556371129679
+dev 8: 0.6138045798505158
+
+mean_qwk: 0.720978573172135
+pos2gram_dim:250
+pos3gram_dim:100
+word_gram_dim:1000

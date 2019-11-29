@@ -21,6 +21,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 import numpy as np
 from nltk.tree import *
+import config
 
 
 def remove_stop_word(data):

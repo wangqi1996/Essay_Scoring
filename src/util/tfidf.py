@@ -9,6 +9,7 @@ from sklearn.feature_extraction.text import TfidfTransformer
 
 from src.util.util import tokenizer, word_stemming_remove_stop
 import numpy as np
+import config
 
 
 #
@@ -115,12 +116,15 @@ def tfidf_test(data, tf_vocab, idf_diag):
     return tfidf
 
 
-def tfTF_train(data,word_ngram=False):
+def tfTF_train(data,word_ngram=False,gram_num = 2):
     """ 计算tfTF input: sentences"""
     if word_ngram:
-        vectorizer = CountVectorizer(max_features=1000)
+        vectorizer = CountVectorizer(max_features=config.word_gram_dim)
     else:
-        vectorizer = CountVectorizer(max_features=250)
+        if gram_num == 2:
+            vectorizer = CountVectorizer(max_features=config.pos2gram_dim)
+        elif gram_num == 3:
+            vectorizer = CountVectorizer(max_features=config.pos3gram_dim)
     train_tf = vectorizer.fit_transform(data).toarray()
     TF = np.sum(train_tf, 0)
 
@@ -132,7 +136,7 @@ def tfTF_train(data,word_ngram=False):
 def tfTF_test(data, TF, tf_vocab,word_ngram=False):
     """ 计算tfTF input: sentences"""
     if word_ngram:
-        vectorizer = CountVectorizer(vocabulary=tf_vocab,max_features=1000)
+        vectorizer = CountVectorizer(vocabulary=tf_vocab,max_features=config.word_gram_dim)
     else:
         vectorizer = CountVectorizer(vocabulary=tf_vocab)
 

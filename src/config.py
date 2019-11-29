@@ -20,7 +20,7 @@ TOKENIZER_FIELD = 'essay_t' \
 
 pos2gram_dim = 250
 pos3gram_dim = 100
-word_gram_dim=1000
+word_gram_dim=500
 
 
 feature_list = [

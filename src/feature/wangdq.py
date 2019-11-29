@@ -67,7 +67,9 @@ def pos_gram_train(tagged_data, gram):
 
     join_data = [' '.join(d) for d in gramed_data]
 
-    train_tfTF, TF, tf_vocab = tfTF_train(join_data, word_ngram=False)
+    train_tfTF, TF, tf_vocab = tfTF_train(join_data, word_ngram=False, gram_num= gram)
+
+    print("pos",gram,train_tfTF.shape)
 
     return train_tfTF, TF, tf_vocab
 
