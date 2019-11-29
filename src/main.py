@@ -141,7 +141,8 @@ def save_info_to_file(feature_list, use_dev, score_list, mean_qwk):
         file.writelines('mean_qwk: ' + str(mean_qwk) + '\n')
         file.writelines('pos2gram_dim:' + str(config.pos2gram_dim) + '\n')
         file.writelines('pos3gram_dim:' + str(config.pos3gram_dim) + '\n')
-        file.writelines('word_gram_dim:' + str(config.word_gram_dim) + '\n')
+        file.writelines('word_gram_dim:' + str(config.word_2gram_dim) + '\n')
+        file.writelines('word_gram_dim:' + str(config.word_3gram_dim) + '\n')
 
 
 def model(model_name, feature, label, set_id):

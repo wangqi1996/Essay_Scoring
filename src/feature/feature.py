@@ -98,18 +98,24 @@ class Feature:
             return var_word_length
 
         if 'mean_clause_length' == feature_name:
-            mean_clause_length, mean_clause_number = mean_clause(sentences_set)
+            mean_clause_length, mean_clause_number, mean_sentence_depth, mean_sentence_level = mean_clause(
+                sentences_set)
             feature_dict.update({
                 "mean_clause_length": mean_clause_length,
-                "mean_clause_number": mean_clause_number
+                "mean_clause_number": mean_clause_number,
+                "mean_sentence_depth": mean_sentence_depth,
+                "mean_sentence_level": mean_sentence_level
             })
             return mean_clause_length
 
         if 'mean_clause_number' == feature_name:
-            mean_clause_length, mean_clause_number = mean_clause(sentences_set)
+            mean_clause_length, mean_clause_number, mean_sentence_depth, mean_sentence_level = mean_clause(
+                sentences_set)
             feature_dict.update({
                 "mean_clause_length": mean_clause_length,
-                "mean_clause_number": mean_clause_number
+                "mean_clause_number": mean_clause_number,
+                "mean_sentence_depth": mean_sentence_depth,
+                "mean_sentence_level": mean_sentence_level
             })
             return mean_clause_number
 
@@ -137,16 +143,22 @@ class Feature:
             return error
 
         if 'mean_sentence_depth' == feature_name:
-            mean_sentence_depth, mean_sentence_level = Mean_sentence_depth_level(train_data)
+            mean_clause_length, mean_clause_number, mean_sentence_depth, mean_sentence_level = mean_clause(
+                sentences_set)
             feature_dict.update({
+                "mean_clause_length": mean_clause_length,
+                "mean_clause_number": mean_clause_number,
                 "mean_sentence_depth": mean_sentence_depth,
                 "mean_sentence_level": mean_sentence_level
             })
             return mean_sentence_depth
 
         if 'mean_sentence_level' == feature_name:
-            mean_sentence_depth, mean_sentence_level = Mean_sentence_depth_level(train_data)
+            mean_clause_length, mean_clause_number, mean_sentence_depth, mean_sentence_level = mean_clause(
+                sentences_set)
             feature_dict.update({
+                "mean_clause_length": mean_clause_length,
+                "mean_clause_number": mean_clause_number,
                 "mean_sentence_depth": mean_sentence_depth,
                 "mean_sentence_level": mean_sentence_level
             })
@@ -342,5 +354,5 @@ class Feature:
         else:
             feature = self.normalizer.transform(feature)
 
-        # print(feature_dict)
+        print("feature.shape = ", feature.shape)
         return feature, feature_dict

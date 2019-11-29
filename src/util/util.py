@@ -6,6 +6,7 @@
 import logging
 
 import nltk
+import numpy
 from nltk.corpus import stopwords
 
 stoplist = stopwords.words('english')
@@ -102,18 +103,22 @@ def constituency_tree(train_data):
     """ 计算mean clause使用
      input: sentences"""
 
-    # nlp = StanfordCoreNLP(STANFORDCORENLP_PATH, quiet=False, logging_level=logging.DEBUG)
     nlp = StanfordCoreNLP(STANFORDCORENLP_PATH)
     clause_nums = []
     clause_lengths = []
     sentences_num = []
+    mean_depth = []
+    mean_level = []
     for essay in train_data:
 
         global clause_num
         global clause_length
+
         clause_num = 0
         clause_length = 0
 
+        depth_all = 0
+        level_all = 0
         # 对每句话进行处理
         sentences = get_sentences(essay)
         sentences_num.append(len(sentences))
@@ -121,28 +126,46 @@ def constituency_tree(train_data):
         for sentence in sentences:
 
             tokens = word_tokenize(sentence)
-
             if len(tokens) > 80:
                 continue
-
             constituency_str = nlp.parse(sentence)
             tree = Tree.fromstring(constituency_str)
 
             # tree.draw()
-            traverse_nltk_tree(tree, 'SBAR')
+            distance = []
+            traverse_nltk_tree(tree, 'SBAR', 1, distance)
+
+            distance = numpy.array(distance)
+            depth = numpy.sum(distance)
+            level = numpy.amax(distance)
+            depth_all += depth
+            level_all += level
+
+        mean_depth.append(depth_all / len(sentences))
+        mean_level.append(level_all / len(sentences))
 
         clause_nums.append(clause_num)
         clause_lengths.append(clause_length)
 
     nlp.close()
 
-    return np.array(clause_lengths), np.array(clause_nums), np.array(sentences_num)
+    clause_lengths = np.array(clause_lengths).reshape(-1, 1)
+    clause_nums = np.array(clause_nums).reshape(-1, 1)
+    sentences_num = np.array(sentences_num).reshape(-1, 1)
+    ret_depth = numpy.array(mean_depth).reshape(-1, 1)
+    ret_level = numpy.array(mean_level).reshape(-1, 1)
+
+    return clause_lengths, clause_nums, sentences_num, ret_depth, ret_level
 
 
-def traverse_nltk_tree(node, label):
+def traverse_nltk_tree(node, label, length, res):
     """ 遍历nltk树，找子树 """
-    if not node or type(node) == str:
+    if not node:
         # 说明是叶子节点
+        return
+
+    if type(node) == str:
+        res.append(length)
         return
 
     global clause_num
@@ -157,7 +180,8 @@ def traverse_nltk_tree(node, label):
     # 遍历所有的孩子节点
     node_num = len(node)
     for i in range(node_num):
-        traverse_nltk_tree(node[i], label)
+        if node[i]:
+            traverse_nltk_tree(node[i], label, length + 1, res)
     return
 
 

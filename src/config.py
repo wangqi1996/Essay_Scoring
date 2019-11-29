@@ -20,8 +20,8 @@ TOKENIZER_FIELD = 'essay_t' \
 
 pos2gram_dim = 250
 pos3gram_dim = 100
-word_2gram_dim=750
-word_3gram_dim=500
+word_2gram_dim=1000
+word_3gram_dim=1000
 
 
 feature_list = [
@@ -59,6 +59,6 @@ feature_list = [
     # "mean_clause_length",
     # "mean_clause_number",
     # "semantic_vector_similarity",
-    "pos_trigram",
+    # "pos_trigram",
 
 ]

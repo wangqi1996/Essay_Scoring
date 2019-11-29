@@ -23,8 +23,8 @@ bag_of_words
 
 use_dev:No
 
-mean_qwk: 0.8085723560497518
+mean_qwk: 0.8062724242816393
 pos2gram_dim:250
 pos3gram_dim:100
-word_gram_dim:1000
-word_gram_dim:1000
+word_gram_dim:750
+word_gram_dim:500

@@ -100,7 +100,7 @@ def mean_clause(data):
 
     print("mean_clause")
 
-    clause_lengths, clause_nums, sentences_num = constituency_tree(data)
+    clause_lengths, clause_nums, sentences_num, ret_depth, ret_level = constituency_tree(data)
 
     mean_clause_num = clause_nums / sentences_num
     # 暂时for处理了
@@ -111,7 +111,10 @@ def mean_clause(data):
     mean_clause_length = clause_lengths / clause_nums
 
     sample_num = len(data)
-    return mean_clause_length.reshape(sample_num, 1), mean_clause_num.reshape(sample_num, 1)
+
+    mean_clause_length = mean_clause_length.reshape(sample_num, 1)
+    mean_clause_num = mean_clause_num.reshape(sample_num, 1)
+    return mean_clause_length, mean_clause_num, ret_depth, ret_level
 
 
 NGRAM_PATH = "../../data/good_pos_ngrams.p"
