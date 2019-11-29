@@ -65,7 +65,7 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
         train_feature, train_feature_dict = feature_class.get_saved_feature_all(train_feature_dict,
                                                                                 train_sentences_list, train_tokens_list,
                                                                                 train_data, train_scores, 'train',
-                                                                                reset_list)
+                                                                                feature_list)
         train_dataset.save_feature(set_id, train_feature_dict, 'train')
 
         et = time.time()
@@ -144,9 +144,8 @@ def save_info_to_file(feature_list, use_dev, score_list, mean_qwk):
         file.writelines('pos3gram_dim:' + str(config.pos3gram_dim) + '\n')
         file.writelines('word_2gram_dim:' + str(config.word_2gram_dim) + '\n')
         file.writelines('word_3gram_dim:' + str(config.word_3gram_dim) + '\n\n')
-        current_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-        file.writelines('current_time: '+current_time)
-
+        current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        file.writelines('current_time: ' + current_time)
 
 
 def model(model_name, feature, label, set_id):

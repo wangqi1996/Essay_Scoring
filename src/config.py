@@ -65,7 +65,7 @@ feature_list = [
 
     'NN_result',  # 名词
 
-    #  二元的
+    # 二元的
     'RB_JJ',  # 副词 + 形容词
     'JJR_NN',  # 最高级 + 名词
     'JJS_NNPS',  # 最高级 + 专有名词复数
