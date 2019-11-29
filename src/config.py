@@ -17,6 +17,11 @@ ESSAY_FIELD = 'essay'
 SCORE_FIELD = 'domain1_score'
 TOKENIZER_FIELD = 'essay_token'
 
+pos2gram_dim = 250
+pos3gram_dim = 100
+word_gram_dim=1000
+
+
 feature_list = [
 
     "wv_similarity",
