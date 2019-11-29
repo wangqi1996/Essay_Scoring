@@ -1,7 +1,7 @@
 # encoding=utf-8
 
 
-STANFORDCORENLP_PATH = r'/Users/ikuc/stanfordnlp_resources/stanford-corenlp-full-2016-10-31'
+STANFORDCORENLP_PATH = r'../lib/stanford-corenlp-full-2016-10-31'
 
 TRAIN_DADA_PATH = r'../data/train.pickle'
 TEST_DATA_PATH = r'../data/test.pickle'
@@ -19,13 +19,14 @@ TOKENIZER_FIELD = 'essay_t' \
                   'oken'
 
 pos2gram_dim = 250
-pos3gram_dim = 100
-word_2gram_dim=1000
-word_3gram_dim=1000
 
+pos3gram_dim = 100
+
+word_2gram_dim = 1000
+word_3gram_dim = 500
 
 feature_list = [
-
+    #
     "wv_similarity",
     "pos_bigram",
 
@@ -34,6 +35,7 @@ feature_list = [
 
     "mean_word_length",
     "var_word_length",
+
     "mean_sentence_length",
     "var_sentence_length",
 
@@ -49,16 +51,31 @@ feature_list = [
     'unique_size',
 
     'PRP_result',
-    'MD_result',
+    # 'MD_result',
     'NNP_result',
-    'COMMA_result',
+
+    #
+    # 'JJ_result',  # 形容词
+    # 'JJR_result',  # 比较级词语
+    # 'JJS_result',  # 最高级
+    # 'RB_result',  # 副词
+    # 'RBR_result',  # 副词比较级
+    # 'RBS_result',  # 副词比较级
+    # 'PDT_result',  # 前限定词a
+
     'bag_of_words',
+
     # "mean_sentence_depth",
     # "mean_sentence_level",
-
+    #
     # "mean_clause_length",
     # "mean_clause_number",
+
     # "semantic_vector_similarity",
     # "pos_trigram",
+
+    # 'COMMA_result',
+
+
 
 ]

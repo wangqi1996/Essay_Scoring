@@ -220,44 +220,202 @@ class Feature:
             return unique_size
 
         if 'PRP_result' == feature_name:
-            PRP_result, MD_result, NNP_result, COMMA_result = pos_tagger(self.get_tagged_data(token_set))
+            PRP_result, MD_result, NNP_result, COMMA_result, JJ_result, JJS_result, JJR_result, RB_result, RBR_result, RBS_result, PDT_result = pos_tagger(
+                self.get_tagged_data(token_set))
             feature_dict.update({
                 "PRP_result": PRP_result,
                 "MD_result": MD_result,
                 "NNP_result": NNP_result,
                 "COMMA_result": COMMA_result,
+                "JJ_result": JJ_result,
+                "JJS_result": JJS_result,
+                "JJR_result": JJR_result,
+                "RB_result": RB_result,
+                "RBR_result": RBR_result,
+                "RBS_result": RBS_result,
+                "PDT_result": PDT_result
             })
             return PRP_result
 
         if 'MD_result' == feature_name:
-            PRP_result, MD_result, NNP_result, COMMA_result = pos_tagger(self.get_tagged_data(token_set))
+            PRP_result, MD_result, NNP_result, COMMA_result, JJ_result, JJS_result, JJR_result, RB_result, RBR_result, RBS_result, PDT_result = pos_tagger(
+                self.get_tagged_data(token_set))
             feature_dict.update({
                 "PRP_result": PRP_result,
                 "MD_result": MD_result,
                 "NNP_result": NNP_result,
                 "COMMA_result": COMMA_result,
+                "JJ_result": JJ_result,
+                "JJS_result": JJS_result,
+                "JJR_result": JJR_result,
+                "RB_result": RB_result,
+                "RBR_result": RBR_result,
+                "RBS_result": RBS_result,
+                "PDT_result": PDT_result
             })
             return MD_result
 
         if 'NNP_result' == feature_name:
-            PRP_result, MD_result, NNP_result, COMMA_result = pos_tagger(self.get_tagged_data(token_set))
+            PRP_result, MD_result, NNP_result, COMMA_result, JJ_result, JJS_result, JJR_result, RB_result, RBR_result, RBS_result, PDT_result = pos_tagger(
+                self.get_tagged_data(token_set))
             feature_dict.update({
                 "PRP_result": PRP_result,
                 "MD_result": MD_result,
                 "NNP_result": NNP_result,
                 "COMMA_result": COMMA_result,
+                "JJ_result": JJ_result,
+                "JJS_result": JJS_result,
+                "JJR_result": JJR_result,
+                "RB_result": RB_result,
+                "RBR_result": RBR_result,
+                "RBS_result": RBS_result,
+                "PDT_result": PDT_result
             })
             return NNP_result
 
         if 'COMMA_result' == feature_name:
-            PRP_result, MD_result, NNP_result, COMMA_result = pos_tagger(self.get_tagged_data(token_set))
+            PRP_result, MD_result, NNP_result, COMMA_result, JJ_result, JJS_result, JJR_result, RB_result, RBR_result, RBS_result, PDT_result = pos_tagger(
+                self.get_tagged_data(token_set))
             feature_dict.update({
                 "PRP_result": PRP_result,
                 "MD_result": MD_result,
                 "NNP_result": NNP_result,
                 "COMMA_result": COMMA_result,
+                "JJ_result": JJ_result,
+                "JJS_result": JJS_result,
+                "JJR_result": JJR_result,
+                "RB_result": RB_result,
+                "RBR_result": RBR_result,
+                "RBS_result": RBS_result,
+                "PDT_result": PDT_result
             })
             return COMMA_result
+
+        if 'JJ_result' == feature_name:
+            PRP_result, MD_result, NNP_result, COMMA_result, JJ_result, JJS_result, JJR_result, RB_result, RBR_result, RBS_result, PDT_result = pos_tagger(
+                self.get_tagged_data(token_set))
+            feature_dict.update({
+                "PRP_result": PRP_result,
+                "MD_result": MD_result,
+                "NNP_result": NNP_result,
+                "COMMA_result": COMMA_result,
+                "JJ_result": JJ_result,
+                "JJS_result": JJS_result,
+                "JJR_result": JJR_result,
+                "RB_result": RB_result,
+                "RBR_result": RBR_result,
+                "RBS_result": RBS_result,
+                "PDT_result": PDT_result
+            })
+            return JJ_result
+
+        if 'JJS_result' == feature_name:
+            PRP_result, MD_result, NNP_result, COMMA_result, JJ_result, JJS_result, JJR_result, RB_result, RBR_result, RBS_result, PDT_result = pos_tagger(
+                self.get_tagged_data(token_set))
+            feature_dict.update({
+                "PRP_result": PRP_result,
+                "MD_result": MD_result,
+                "NNP_result": NNP_result,
+                "COMMA_result": COMMA_result,
+                "JJ_result": JJ_result,
+                "JJS_result": JJS_result,
+                "JJR_result": JJR_result,
+                "RB_result": RB_result,
+                "RBR_result": RBR_result,
+                "RBS_result": RBS_result,
+                "PDT_result": PDT_result
+            })
+            return JJS_result
+
+        if 'JJR_result' == feature_name:
+            PRP_result, MD_result, NNP_result, COMMA_result, JJ_result, JJS_result, JJR_result, RB_result, RBR_result, RBS_result, PDT_result = pos_tagger(
+                self.get_tagged_data(token_set))
+            feature_dict.update({
+                "PRP_result": PRP_result,
+                "MD_result": MD_result,
+                "NNP_result": NNP_result,
+                "COMMA_result": COMMA_result,
+                "JJ_result": JJ_result,
+                "JJS_result": JJS_result,
+                "JJR_result": JJR_result,
+                "RB_result": RB_result,
+                "RBR_result": RBR_result,
+                "RBS_result": RBS_result,
+                "PDT_result": PDT_result
+            })
+            return JJR_result
+
+        if 'RB_result' == feature_name:
+            PRP_result, MD_result, NNP_result, COMMA_result, JJ_result, JJS_result, JJR_result, RB_result, RBR_result, RBS_result, PDT_result = pos_tagger(
+                self.get_tagged_data(token_set))
+            feature_dict.update({
+                "PRP_result": PRP_result,
+                "MD_result": MD_result,
+                "NNP_result": NNP_result,
+                "COMMA_result": COMMA_result,
+                "JJ_result": JJ_result,
+                "JJS_result": JJS_result,
+                "JJR_result": JJR_result,
+                "RB_result": RB_result,
+                "RBR_result": RBR_result,
+                "RBS_result": RBS_result,
+                "PDT_result": PDT_result
+            })
+            return RB_result
+
+        if 'RBR_result' == feature_name:
+            PRP_result, MD_result, NNP_result, COMMA_result, JJ_result, JJS_result, JJR_result, RB_result, RBR_result, RBS_result, PDT_result = pos_tagger(
+                self.get_tagged_data(token_set))
+            feature_dict.update({
+                "PRP_result": PRP_result,
+                "MD_result": MD_result,
+                "NNP_result": NNP_result,
+                "COMMA_result": COMMA_result,
+                "JJ_result": JJ_result,
+                "JJS_result": JJS_result,
+                "JJR_result": JJR_result,
+                "RB_result": RB_result,
+                "RBR_result": RBR_result,
+                "RBS_result": RBS_result,
+                "PDT_result": PDT_result
+            })
+            return RBR_result
+
+        if 'RBS_result' == feature_name:
+            PRP_result, MD_result, NNP_result, COMMA_result, JJ_result, JJS_result, JJR_result, RB_result, RBR_result, RBS_result, PDT_result = pos_tagger(
+                self.get_tagged_data(token_set))
+            feature_dict.update({
+                "PRP_result": PRP_result,
+                "MD_result": MD_result,
+                "NNP_result": NNP_result,
+                "COMMA_result": COMMA_result,
+                "JJ_result": JJ_result,
+                "JJS_result": JJS_result,
+                "JJR_result": JJR_result,
+                "RB_result": RB_result,
+                "RBR_result": RBR_result,
+                "RBS_result": RBS_result,
+                "PDT_result": PDT_result
+            })
+            return RBS_result
+
+        if 'PDT_result' == feature_name:
+            PRP_result, MD_result, NNP_result, COMMA_result, JJ_result, JJS_result, JJR_result, RB_result, RBR_result, RBS_result, PDT_result = pos_tagger(
+                self.get_tagged_data(token_set))
+            feature_dict.update({
+                "PRP_result": PRP_result,
+                "MD_result": MD_result,
+                "NNP_result": NNP_result,
+                "COMMA_result": COMMA_result,
+                "JJ_result": JJ_result,
+                "JJS_result": JJS_result,
+                "JJR_result": JJR_result,
+                "RB_result": RB_result,
+                "RBR_result": RBR_result,
+                "RBS_result": RBS_result,
+                "PDT_result": PDT_result
+            })
+            return PDT_result
 
         if 'wv_similarity' == feature_name:
             if name == 'train':
