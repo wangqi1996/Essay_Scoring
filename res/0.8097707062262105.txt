@@ -1,0 +1,27 @@
+feature:
+wv_similarity
+pos_bigram
+word_bigram
+word_trigram
+mean_word_length
+var_word_length
+mean_sentence_length
+var_sentence_length
+spell_error
+essay_length
+current_pos
+error_pos
+vocab_size
+unique_size
+PRP_result
+MD_result
+NNP_result
+COMMA_result
+bag_of_words
+
+use_dev:No
+
+mean_qwk: 0.8097707062262105
+pos2gram_dim:250
+pos3gram_dim:100
+word_gram_dim:1000

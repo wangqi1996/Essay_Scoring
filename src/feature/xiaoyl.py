@@ -143,7 +143,7 @@ def word_bigram_train(train_data):
 
     join_data = [' '.join(d) for d in gramed_data]
 
-    train_tfTF, TF, tf_vocab = tfTF_train(join_data, word_ngram=True)
+    train_tfTF, TF, tf_vocab = tfTF_train(join_data, word_ngram=True, gram_num=2)
 
     return train_tfTF, TF, tf_vocab
 
@@ -172,7 +172,7 @@ def word_trigram_train(train_data):
 
     join_data = [' '.join(d) for d in gramed_data]
 
-    train_tfTF, TF, tf_vocab = tfTF_train(join_data, word_ngram=True)
+    train_tfTF, TF, tf_vocab = tfTF_train(join_data, word_ngram=True, gram_num=3)
 
     return train_tfTF, TF, tf_vocab
 
@@ -192,6 +192,7 @@ def word_trigram_test(test_data, TF, tf_vocab):
 
     return test_tfTF
 
+
 def bag_of_words_train(train_data):
     """ input: tokens"""
     print("bag_of_words_train")
@@ -200,7 +201,7 @@ def bag_of_words_train(train_data):
 
     join_data = [' '.join(d) for d in gramed_data]
 
-    train_tfTF, TF, tf_vocab = tfTF_train(join_data,word_ngram=True)
+    train_tfTF, TF, tf_vocab = tfTF_train(join_data, word_ngram=True)
 
     return train_tfTF, TF, tf_vocab
 
@@ -216,6 +217,6 @@ def bag_of_words_test(test_data, TF, tf_vocab):
     gramed_data = ngram(test_data, 1)
 
     join_data = [' '.join(d) for d in gramed_data]
-    test_tfTF = tfTF_test(join_data, TF, tf_vocab,word_ngram=True)
+    test_tfTF = tfTF_test(join_data, TF, tf_vocab, word_ngram=True)
 
     return test_tfTF

@@ -116,10 +116,13 @@ def tfidf_test(data, tf_vocab, idf_diag):
     return tfidf
 
 
-def tfTF_train(data,word_ngram=False,gram_num = 2):
+def tfTF_train(data, word_ngram=False, gram_num=2):
     """ 计算tfTF input: sentences"""
     if word_ngram:
-        vectorizer = CountVectorizer(max_features=config.word_gram_dim)
+        if gram_num == 2:
+            vectorizer = CountVectorizer(max_features=config.word_2gram_dim)
+        else:
+            vectorizer = CountVectorizer(max_features=config.word_3gram_dim)
     else:
         if gram_num == 2:
             vectorizer = CountVectorizer(max_features=config.pos2gram_dim)
@@ -133,10 +136,10 @@ def tfTF_train(data,word_ngram=False,gram_num = 2):
     return train_tf / TF, TF, tf_vocab
 
 
-def tfTF_test(data, TF, tf_vocab,word_ngram=False):
+def tfTF_test(data, TF, tf_vocab, word_ngram=False):
     """ 计算tfTF input: sentences"""
     if word_ngram:
-        vectorizer = CountVectorizer(vocabulary=tf_vocab,max_features=config.word_gram_dim)
+        vectorizer = CountVectorizer(vocabulary=tf_vocab)
     else:
         vectorizer = CountVectorizer(vocabulary=tf_vocab)
 

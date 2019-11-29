@@ -67,9 +67,9 @@ def pos_gram_train(tagged_data, gram):
 
     join_data = [' '.join(d) for d in gramed_data]
 
-    train_tfTF, TF, tf_vocab = tfTF_train(join_data, word_ngram=False, gram_num= gram)
+    train_tfTF, TF, tf_vocab = tfTF_train(join_data, word_ngram=False, gram_num=gram)
 
-    print("pos",gram,train_tfTF.shape)
+    # print("pos",gram,train_tfTF.shape)
 
     return train_tfTF, TF, tf_vocab
 
@@ -121,6 +121,8 @@ def good_pos_ngrams(tagged_data, gram=2):
     """
     input: tokens
     """
+    print("good_pos_ngrams")
+
     if (os.path.isfile(NGRAM_PATH)):
         good_pos_ngrams = pickle.load(open(NGRAM_PATH, 'rb'))
     else:
@@ -154,7 +156,7 @@ def pos_tagger(tagged_data):
     """
     input: tokens
     """
-
+    print("pos_tagger")
     PRP_result = []
     MD_result = []
     NNP_result = []
@@ -182,6 +184,7 @@ def pos_tagger(tagged_data):
 def vocab_size(data):
     """ input: tokens"""
 
+    print('vocab_size')
     unique_len = []
     essay_len = []
     data = remove_stop_word(data)

@@ -1,7 +1,7 @@
 # encoding=utf-8
 import copy
-import sys
 import os
+import sys
 
 from sklearn.tree import DecisionTreeClassifier
 
@@ -12,7 +12,7 @@ import time
 
 from sklearn.svm import SVR
 
-from src.config import TRAIN_DADA_PATH, DEV_DATA_PATH, TEST_DATA_PATH,feature_list
+from src.config import TRAIN_DADA_PATH, DEV_DATA_PATH, TEST_DATA_PATH, feature_list
 from src.data import Dataset
 from src.feature.feature import Feature
 from src.metrics import kappa
@@ -23,7 +23,6 @@ from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier
 from sklearn.linear_model import BayesianRidge
 
 import config
-
 
 
 def train(contain_test=False, use_save=False, model_name='SVR'):
@@ -61,46 +60,27 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
         print("start compute the feature for essay set  %s， train_set_len = %s" % (set_id, len(train_sentences_list)))
         st = time.time()
 
-        # if use_save:
-        #     train_feature = feature_class.get_save_train_feature(train_sentences_list, train_tokens_list)
-        # else:
-        #     train_feature = feature_class.get_train_feature(train_sentences_list, train_tokens_list, train_scores,
-        #                                                     train_data)
-
+        reset_list = ['word_bigram', 'word_trigram', 'pos_bigram', 'pos_trigram']
         train_feature, train_feature_dict = feature_class.get_saved_feature_all(train_feature_dict,
                                                                                 train_sentences_list, train_tokens_list,
-                                                                                train_data, train_scores, 'train', [])
+                                                                                train_data, train_scores, 'train',
+                                                                                reset_list)
         train_dataset.save_feature(set_id, train_feature_dict, 'train')
 
         et = time.time()
         print("end compute the feature for essay set, ", set_id, "time = ", et - st)
 
-        dev_sentences_list, dev_tokens_list, dev_scores = Dataset.get_data_list(dev_data, acquire_score=True)
-        dev_feature = feature_class.get_test_feature(dev_sentences_list, dev_tokens_list, train_scores, train_data,
-                                                     dev_data)
-        x = np.concatenate((train_feature, dev_feature), axis=0)
-        y = np.concatenate((train_scores, dev_scores), axis=0)
-
         # 3. 构建模型，训练
-        use_dev = 'No' #手动修改
+        use_dev = 'No'  # 手动修改
         clf = model(model_name, train_feature, train_scores, set_id)
 
         # 4. 测试
         dev_sentences_list, dev_tokens_list, dev_scores = Dataset.get_data_list(dev_data, acquire_score=True)
-        # if use_save:
-        #     dev_feature = train_dataset.load_feature(set_id, 'dev')
-        #     dev_feature = feature_class.get_test_save_feature(dev_feature, dev_sentences_list, dev_tokens_list,
-        #                                                       train_scores, train_data,
-        #                                                       dev_data)
-        # else:
-        #     dev_feature = feature_class.get_test_feature(dev_sentences_list, dev_tokens_list, train_scores, train_data,
-        #                                                  dev_data)
-        #
-        # train_dataset.save_feature(set_id, feature_class.save_feature(dev_feature), 'dev')
+
         dev_feature_dict = train_dataset.load_feature(set_id, 'dev')
         dev_feature, dev_feature_dict = feature_class.get_saved_feature_all(dev_feature_dict,
                                                                             dev_sentences_list, dev_tokens_list,
-                                                                            dev_data, train_scores, 'dev', [])
+                                                                            dev_data, train_scores, 'dev', reset_list)
         train_dataset.save_feature(set_id, dev_feature_dict, 'dev')
 
         print('dev ends')
@@ -110,13 +90,12 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
         mean_qwk += qwk
 
         test_sentences_list, test_tokens_list = Dataset.get_data_list(test_data, acquire_score=False)
-        # test_feature = feature_class.get_test_feature(test_sentences_list, test_tokens_list, train_scores,
-        #                                               train_data, test_data)
 
         test_feature_dict = train_dataset.load_feature(set_id, 'test')
         test_feature, test_feature_dict = feature_class.get_saved_feature_all(test_feature_dict,
                                                                               test_sentences_list, test_tokens_list,
-                                                                              test_data, train_scores, 'test', [])
+                                                                              test_data, train_scores, 'test',
+                                                                              reset_list)
         train_dataset.save_feature(set_id, test_feature_dict, 'test')
 
         test_predicted = clf.predict(test_feature)
@@ -153,16 +132,16 @@ def save_info_to_file(feature_list, use_dev, score_list, mean_qwk):
     with open(filename, 'w', encoding='utf-8') as file:
         file.writelines('feature:\n')
         for feature in feature_list:
-            file.writelines(feature+'\n')
+            file.writelines(feature + '\n')
         file.writelines('\n')
-        file.writelines('use_dev:'+use_dev+'\n')
-        for idx,score in enumerate(score_list):
-            file.writelines('dev '+str(idx+1)+': '+str(score)+'\n')
+        file.writelines('use_dev:' + use_dev + '\n')
+        for idx, score in enumerate(score_list):
+            file.writelines('dev ' + str(idx + 1) + ': ' + str(score) + '\n')
         file.writelines('\n')
-        file.writelines('mean_qwk: '+str(mean_qwk)+'\n')
-        file.writelines('pos2gram_dim:'+str(config.pos2gram_dim)+'\n')
-        file.writelines('pos3gram_dim:'+str(config.pos3gram_dim)+'\n')
-        file.writelines('word_gram_dim:'+str(config.word_gram_dim)+'\n')
+        file.writelines('mean_qwk: ' + str(mean_qwk) + '\n')
+        file.writelines('pos2gram_dim:' + str(config.pos2gram_dim) + '\n')
+        file.writelines('pos3gram_dim:' + str(config.pos3gram_dim) + '\n')
+        file.writelines('word_gram_dim:' + str(config.word_gram_dim) + '\n')
 
 
 def model(model_name, feature, label, set_id):

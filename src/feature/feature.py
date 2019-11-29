@@ -132,7 +132,7 @@ class Feature:
         if 'spell_error' == feature_name:
             error = spell_error(train_data)
             feature_dict.update({
-                "error": error
+                "spell_error": error
             })
             return error
 
