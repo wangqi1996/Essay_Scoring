@@ -1,12 +1,12 @@
-from spellchecker import SpellChecker
-from nltk.tokenize import sent_tokenize
-from stanfordcorenlp import StanfordCoreNLP
-from nltk.tree import *
 import numpy
 from gensim import models, corpora
 from gensim.similarities import MatrixSimilarity
 from nltk.corpus import stopwords as pw
-import matplotlib.pyplot as plt
+from nltk.tokenize import sent_tokenize
+from nltk.tree import *
+from spellchecker import SpellChecker
+from stanfordcorenlp import StanfordCoreNLP
+
 from src.config import STANFORDCORENLP_PATH
 
 

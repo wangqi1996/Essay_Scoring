@@ -1,70 +1,47 @@
 # encoding=utf-8
 import numpy as np
+from sklearn import preprocessing
 
 from src.config import feature_list
-from src.feature.iku import spell_error, Mean_sentence_depth_level, essay_length, semantic_vector_similarity
+from src.feature.iku import spell_error, Mean_sentence_depth_level, essay_length
 from src.feature.wangdq import word_vector_similarity_train, word_vector_similarity_test, \
-    mean_clause, pos_gram_train, pos_gram_test, good_pos_ngrams, vocab_size
+    mean_clause, pos_gram_train, pos_gram_test, good_pos_ngrams, vocab_size, pos_tagger
 from src.feature.xiaoyl import word_length, get_sentence_length, word_bigram_train, word_bigram_test, \
-    word_trigram_train, \
-    word_trigram_test, bag_of_words_train, bag_of_words_test
-
-from sklearn import preprocessing
+    word_trigram_train, word_trigram_test, bag_of_words_train, bag_of_words_test
+from util.util import pos_tagging
 
 
 class Feature:
 
     def __init__(self):
-        # 应该放在dataset中懒得放了
-        # 禁止从这个类初始化
-        self.wv_similarity = None
+
         self.wv_idf_diag = None
         self.wv_tf_vocab = None
         self.wv_tfidf = None
 
-        self.word_bigram = None
         self.word_bigram_TF = None
         self.word_bigram_tf_vocab = None
 
-        self.word_trigram = None
         self.word_trigram_TF = None
         self.word_trigram_tf_vocab = None
 
-        self.bag_of_words = None
         self.bag_of_words_tf_vocab = None
         self.bag_of_words_TF = None
 
-        self.mean_clause_length = None
-        self.mean_clause_number = None
-
-        self.pos_trigram = None
         self.pos_3tf_vocab = None
         self.pos_3TF = None
 
-        self.pos_bigram = None
         self.pos_2tf_vocab = None
         self.pos_2TF = None
 
-        self.mean_word_length = None
-        self.var_word_length = None
-        self.mean_sentence_length = None
-        self.var_sentence_length = None
+        self.normalizer = None
+        self.tagged_data = None
 
-        self.spell_error = None
-        self.mean_sentence_depth = None
-        self.mean_sentence_level = None
-        self.essay_length = None
-        self.semantic_vector_similarity = None
-
-        self.Normalizer = None
-
-        self.train_feature = None
-
-        self.current_pos = None
-        self.error_pos = None
-        self.current_pos3 = None
-        self.error_pos3 = None
-        self.vocab_size = None
+    def get_tagged_data(self, tokens_set):
+        """ 省时间啦 """
+        if self.tagged_data is None:
+            self.tagged_data = pos_tagging(tokens_set)
+        return self.tagged_data
 
     @staticmethod
     def get_instance(feature):
@@ -72,106 +49,26 @@ class Feature:
         feature: {} """
         feature_class = Feature()
 
-        feature_class.wv_similarity = feature.get('wv_similarity', None)
         feature_class.wv_idf_diag = feature.get('wv_idf_diag', None)
         feature_class.wv_tf_vocab = feature.get('wv_tf_vocab', None)
         feature_class.wv_tfidf = feature.get('wv_tfidf', None)
 
-        feature_class.pos_bigram = feature.get('pos_bigram', None)
         feature_class.pos_2tf_vocab = feature.get('pos_2tf_vocab', None)
         feature_class.pos_2TF = feature.get('pos_2TF', None)
 
-        feature_class.pos_trigram = feature.get('pos_trigram', None)
         feature_class.pos_3tf_vocab = feature.get('pos_3tf_vocab', None)
         feature_class.pos_3TF = feature.get('pos_3TF', None)
 
-        feature_class.word_bigram = feature.get('word_bigram', None)
         feature_class.word_bigram_tf_vocab = feature.get('word_bigram_tf_vocab', None)
         feature_class.word_bigram_TF = feature.get('word_bigram_TF', None)
 
-        feature_class.word_trigram = feature.get('word_trigram', None)
         feature_class.word_trigram_tf_vocab = feature.get('word_trigram_tf_vocab', None)
         feature_class.word_trigram_TF = feature.get('word_trigram_TF', None)
 
         feature_class.bag_of_words_tf_vocab = feature.get('bag_of_words_tf_vocab', None)
         feature_class.bag_of_words_TF = feature.get('bag_of_word_TF', None)
-        feature_class.bag_of_words = feature.get('bag_of_words', None)
 
-        feature_class.mean_clause_length = feature.get('mean_clause_length', None)
-        feature_class.mean_clause_number = feature.get('mean_clause_number', None)
-
-        feature_class.mean_word_length = feature.get('mean_word_length', None)
-        feature_class.var_word_length = feature.get('var_word_length', None)
-        feature_class.mean_sentence_length = feature.get('mean_sentence_length', None)
-        feature_class.var_sentence_length = feature.get('var_sentence_length', None)
-
-        feature_class.spell_error = feature.get('spell_error', None)
-        feature_class.mean_sentence_depth = feature.get('mean_sentence_depth', None)
-        feature_class.mean_sentence_level = feature.get('mean_sentence_level', None)
-        feature_class.essay_length = feature.get('essay_length', None)
-        feature_class.semantic_vector_similarity = feature.get('semantic_vector_similarity', None)
-
-        feature_class.error_pos = feature.get('error_pos', None)
-        feature_class.current_pos = feature.get('current_pos', None)
-
-        feature_class.error_pos3 = feature.get('error_pos3', None)
-        feature_class.current_pos3 = feature.get('current_pos3', None)
-
-        feature_class.vocab_size = feature.get('vocab_size', None)
-        # 一个array数组
-        feature_class.train_feature = feature.get('train_feature', None)
         return feature_class
-
-    def save_feature(self, train_feature):
-        """ 保存feature和中间需要使用的变量"""
-
-        result = {
-            "wv_tf_vocab": self.wv_tf_vocab,
-            "wv_idf_diag": self.wv_idf_diag,
-            "wv_tfidf": self.wv_tfidf,
-            "pos_2tf_vocab": self.pos_2tf_vocab,
-            "pos_2TF": self.pos_2TF,
-            "pos_3TF": self.pos_3TF,
-            "pos_3tf_vocab": self.pos_3tf_vocab,
-
-            "wv_similarity": self.wv_similarity,
-            "pos_bigram": self.pos_bigram,
-            "pos_trigram": self.pos_trigram,
-            "word_bigram": self.word_bigram,
-            "word_trigram": self.word_trigram,
-            "bag_of_words": self.bag_of_words,
-
-            "mean_clause_length": self.mean_clause_length,
-            "mean_clause_number": self.mean_clause_number,
-
-            "mean_word_length": self.mean_word_length,
-            "var_word_length": self.var_word_length,
-            "mean_sentence_length": self.mean_sentence_length,
-            "var_sentence_length": self.var_sentence_length,
-
-            "word_bigram_tf_vocab": self.word_bigram_tf_vocab,
-            "word_bigram_TF": self.word_bigram_TF,
-            "word_trigram_tf_vocab": self.word_trigram_tf_vocab,
-            "word_trigram_TF": self.word_trigram_TF,
-
-            "spell_error": self.spell_error,
-            "mean_sentence_depth": self.mean_sentence_depth,
-            "mean_sentence_level": self.mean_sentence_level,
-            "essay_length": self.essay_length,
-            "semantic_vector_similarity": self.semantic_vector_similarity,
-
-            "current_pos": self.current_pos,
-            "error_pos": self.error_pos,
-            "current_pos3": self.current_pos3,
-            "error_pos3": self.error_pos3,
-            'vocab_size': self.vocab_size,
-            "train_feature": train_feature
-        }
-
-        return result
-
-    def append_feature(self, *feature):
-        return np.concatenate(feature, axis=1)
 
     def concatenate_feature(self, feature, new_feature):
         if new_feature is None:
@@ -181,260 +78,269 @@ class Feature:
         else:
             return np.concatenate((feature, new_feature), axis=1)
 
-    def get_feature(self, sentences_set, token_set, train_data):
-        """ 不用区分训练测试的, 可以写在这类"""
-        feature = None
+    def get_feature_by_name(self, feature_dict, feature_name, sentences_set, token_set, train_data, train_score,
+                            name='train'):
 
-        if 'mean_clause_length' in feature_list or 'mean_clause_number' in feature_list:
-            mean_clause_length, mean_clause_number = mean_clause(sentences_set)
-            self.mean_clause_number = mean_clause_number
-            self.mean_clause_length = mean_clause_length
-            if 'mean_clause_length' in feature_list:
-                feature = self.concatenate_feature(feature, mean_clause_length)
-            if 'mean_clause_number' in feature_list:
-                feature = self.concatenate_feature(feature, mean_clause_number)
-
-        if 'mean_word_length' in feature_list or 'var_word_length' in feature_list:
+        if 'mean_word_length' == feature_name:
             mean_word_length, var_word_length = word_length(token_set)
-            self.mean_word_length = mean_word_length
-            self.var_word_length = var_word_length
-            if 'mean_word_length' in feature_list:
-                feature = self.concatenate_feature(feature, mean_word_length)
-            if 'var_word_length' in feature_list:
-                feature = self.concatenate_feature(feature, var_word_length)
+            feature_dict.update({
+                "mean_word_length": mean_word_length,
+                "var_word_length": var_word_length
+            })
+            return mean_word_length
 
-        if 'mean_sentence_length' in feature_list or 'var_sentence_length' in feature_list:
+        if 'var_word_length' == feature_name:
+            mean_word_length, var_word_length = word_length(token_set)
+            feature_dict.update({
+                "mean_word_length": mean_word_length,
+                "var_word_length": var_word_length
+            })
+            return var_word_length
+
+        if 'mean_clause_length' == feature_name:
+            mean_clause_length, mean_clause_number = mean_clause(sentences_set)
+            feature_dict.update({
+                "mean_clause_length": mean_clause_length,
+                "mean_clause_number": mean_clause_number
+            })
+            return mean_clause_length
+
+        if 'mean_clause_number' == feature_name:
+            mean_clause_length, mean_clause_number = mean_clause(sentences_set)
+            feature_dict.update({
+                "mean_clause_length": mean_clause_length,
+                "mean_clause_number": mean_clause_number
+            })
+            return mean_clause_number
+
+        if 'mean_sentence_length' == feature_name:
             mean_sentence_length, var_sentence_length = get_sentence_length(sentences_set)
-            self.mean_sentence_length = mean_sentence_length
-            self.var_sentence_length = var_sentence_length
-            if 'mean_sentence_length' in feature_list:
-                feature = self.concatenate_feature(feature, mean_sentence_length)
-            if 'var_sentence_length' in feature_list:
-                feature = self.concatenate_feature(feature, var_sentence_length)
+            feature_dict.update({
+                "mean_sentence_length": mean_sentence_length,
+                "var_sentence_length": var_sentence_length
+            })
+            return mean_sentence_length
 
-        if 'spell_error' in feature_list:
+        if 'var_sentence_length' == feature_name:
+            mean_sentence_length, var_sentence_length = get_sentence_length(sentences_set)
+            feature_dict.update({
+                "mean_sentence_length": mean_sentence_length,
+                "var_sentence_length": var_sentence_length
+            })
+            return var_sentence_length
+
+        if 'spell_error' == feature_name:
             error = spell_error(train_data)
-            self.spell_error = error
-            feature = self.concatenate_feature(feature, error)
+            feature_dict.update({
+                "error": error
+            })
+            return error
 
-        if 'mean_sentence_depth' in feature_list or 'mean_sentence_level' in feature_list:
-            depth, level = Mean_sentence_depth_level(train_data)
-            self.mean_sentence_level = level
-            self.mean_sentence_depth = depth
-            if 'mean_sentence_depth' in feature_list:
-                feature = self.concatenate_feature(feature, depth)
-            if 'mean_sentence_level' in feature_list:
-                feature = self.concatenate_feature(feature, level)
+        if 'mean_sentence_depth' == feature_name:
+            mean_sentence_depth, mean_sentence_level = Mean_sentence_depth_level(train_data)
+            feature_dict.update({
+                "mean_sentence_depth": mean_sentence_depth,
+                "mean_sentence_level": mean_sentence_level
+            })
+            return mean_sentence_depth
 
-        if 'essay_length' in feature_list:
+        if 'mean_sentence_level' == feature_name:
+            mean_sentence_depth, mean_sentence_level = Mean_sentence_depth_level(train_data)
+            feature_dict.update({
+                "mean_sentence_depth": mean_sentence_depth,
+                "mean_sentence_level": mean_sentence_level
+            })
+            return mean_sentence_level
+
+        if 'essay_length' == feature_name:
             length = essay_length(train_data)
-            self.essay_length = length
-            feature = self.concatenate_feature(feature, length)
+            feature_dict.update({
+                "essay_length": length,
+            })
+            return length
 
-        # feature = self.append_feature(mean_clause_length, mean_clause_number, mean_word_length, var_word_length,
-        #                               mean_sentence_length, var_sentence_length)
+        if 'current_pos' == feature_name:
+            current_pos, error_pos = good_pos_ngrams(self.get_tagged_data(token_set), gram=2)
+            feature_dict.update({
+                "current_pos": current_pos,
+                "error_pos": error_pos
+            })
+            return current_pos
 
-        if "current_pos" in feature_list:
-            self.current_pos, self.error_pos = good_pos_ngrams(token_set, gram=2)
-            feature = self.concatenate_feature(feature, self.current_pos)
-            feature = self.concatenate_feature(feature, self.error_pos)
+        if 'error_pos' == feature_name:
+            current_pos, error_pos = good_pos_ngrams(self.get_tagged_data(token_set), gram=2)
+            feature_dict.update({
+                "current_pos": current_pos,
+                "error_pos": error_pos
+            })
+            return error_pos
 
-        if "current_pos3" in feature_list:
-            self.current_pos3, self.error_pos3 = good_pos_ngrams(token_set, gram=3)
-            feature = self.concatenate_feature(feature, self.current_pos3)
-            feature = self.concatenate_feature(feature, self.error_pos3)
+        if 'current_pos3' == feature_name:
+            current_pos3, error_pos3 = good_pos_ngrams(self.get_tagged_data(token_set), gram=3)
+            feature_dict.update({
+                "current_pos3": current_pos3,
+                "error_pos3": error_pos3
+            })
+            return current_pos3
 
-        if 'vocab_size' in feature_list:
-            self.vocab_size = vocab_size(token_set)
-            feature = self.concatenate_feature(feature, self.vocab_size)
+        if 'error_pos3' == feature_name:
+            current_pos3, error_pos3 = good_pos_ngrams(self.get_tagged_data(token_set), gram=3)
+            feature_dict.update({
+                "current_pos3": current_pos3,
+                "error_pos3": error_pos3
+            })
+            return error_pos3
 
-        return feature
+        if 'vocab_size' == feature_name:
+            vocab_len, unique_size = vocab_size(token_set)
+            feature_dict.update({
+                "vocab_size": vocab_len,
+                "unique_size": unique_size
+            })
+            return vocab_len
 
-    def get_save_feature(self):
+        if 'unique_size' == feature_name:
+            vocab_len, unique_size = vocab_size(token_set)
+            feature_dict.update({
+                "vocab_size": vocab_len,
+                "unique_size": unique_size
+            })
+            return unique_size
+
+        if 'PRP_result' == feature_name:
+            PRP_result, MD_result, NNP_result, COMMA_result = pos_tagger(self.get_tagged_data(token_set))
+            feature_dict.update({
+                "PRP_result": PRP_result,
+                "MD_result": MD_result,
+                "NNP_result": NNP_result,
+                "COMMA_result": COMMA_result,
+            })
+            return PRP_result
+
+        if 'MD_result' == feature_name:
+            PRP_result, MD_result, NNP_result, COMMA_result = pos_tagger(self.get_tagged_data(token_set))
+            feature_dict.update({
+                "PRP_result": PRP_result,
+                "MD_result": MD_result,
+                "NNP_result": NNP_result,
+                "COMMA_result": COMMA_result,
+            })
+            return MD_result
+
+        if 'NNP_result' == feature_name:
+            PRP_result, MD_result, NNP_result, COMMA_result = pos_tagger(self.get_tagged_data(token_set))
+            feature_dict.update({
+                "PRP_result": PRP_result,
+                "MD_result": MD_result,
+                "NNP_result": NNP_result,
+                "COMMA_result": COMMA_result,
+            })
+            return NNP_result
+
+        if 'COMMA_result' == feature_name:
+            PRP_result, MD_result, NNP_result, COMMA_result = pos_tagger(self.get_tagged_data(token_set))
+            feature_dict.update({
+                "PRP_result": PRP_result,
+                "MD_result": MD_result,
+                "NNP_result": NNP_result,
+                "COMMA_result": COMMA_result,
+            })
+            return COMMA_result
+
+        if 'wv_similarity' == feature_name:
+            if name == 'train':
+                wv_similarity, self.wv_tf_vocab, self.wv_idf_diag, self.wv_tfidf = word_vector_similarity_train(
+                    token_set, train_score)
+
+            else:
+                wv_similarity = word_vector_similarity_test(token_set, train_score, self.wv_tf_vocab,
+                                                            self.wv_idf_diag, self.wv_tfidf)
+
+            feature_dict.update({
+                "wv_similarity": wv_similarity
+            })
+            return wv_similarity
+
+        if 'pos_bigram' == feature_name:
+            if name == 'train':
+                pos_bigram, self.pos_2TF, self.pos_2tf_vocab = pos_gram_train(self.get_tagged_data(token_set), 2)
+            else:
+                pos_bigram = pos_gram_test(self.get_tagged_data(token_set), self.pos_2TF, self.pos_2tf_vocab, 2)
+
+            feature_dict.update({
+                "pos_bigram": pos_bigram
+            })
+            return pos_bigram
+
+        if 'pos_trigram' == feature_name:
+            if name == 'train':
+                pos_trigram, self.pos_3TF, self.pos_3tf_vocab = pos_gram_train(self.get_tagged_data(token_set), 3)
+            else:
+                pos_trigram = pos_gram_test(self.get_tagged_data(token_set), self.pos_3TF, self.pos_3tf_vocab, 3)
+
+            feature_dict.update({
+                "pos_trigram": pos_trigram
+            })
+            return pos_trigram
+
+        if 'word_bigram' == feature_name:
+            if name == 'train':
+                word_bigram, self.word_bigram_TF, self.word_bigram_tf_vocab = word_bigram_train(token_set)
+            else:
+
+                word_bigram = word_bigram_test(token_set, self.word_bigram_TF, self.word_bigram_tf_vocab)
+
+            feature_dict.update({
+                "word_bigram": word_bigram
+            })
+            return word_bigram
+
+        if 'word_trigram' == feature_name:
+            if name == 'train':
+                word_trigram, self.word_trigram_TF, self.word_trigram_tf_vocab = word_trigram_train(token_set)
+            else:
+
+                word_trigram = word_trigram_test(token_set, self.word_trigram_TF, self.word_trigram_tf_vocab)
+
+            feature_dict.update({
+                "word_trigram": word_trigram
+            })
+            return word_trigram
+
+        if 'semantic_vector_similarity' == feature_name:
+            assert False, u'这个特征没用呀，还没实现'
+
+        if 'bag_of_words' == feature_name:
+            if name == 'train':
+                bag_of_words, self.bag_of_words_TF, self.bag_of_words_tf_vocab = bag_of_words_train(token_set)
+            else:
+                bag_of_words = bag_of_words_test(token_set, self.bag_of_words_TF, self.bag_of_words_tf_vocab)
+
+            feature_dict.update({
+                "bag_of_words": bag_of_words
+            })
+            return bag_of_words
+
+    def get_saved_feature_all(self, feature_dict, sentences_list, tokens_list, train_data, train_score, name='train',
+                              reset_list=[]):
 
         feature = None
-        if 'mean_clause_length' in feature_list:
-            feature = self.concatenate_feature(feature, self.mean_clause_length)
-        if 'mean_clause_number' in feature_list:
-            feature = self.concatenate_feature(feature, self.mean_clause_number)
+        self.tagged_data = None
+        for feature_name in feature_list:
+            feature_value = feature_dict.get(feature_name, None)
 
-        if 'mean_word_length' in feature_list:
-            feature = self.concatenate_feature(feature, self.mean_word_length)
-        if 'var_word_length' in feature_list:
-            feature = self.concatenate_feature(feature, self.var_word_length)
+            if feature_value is None or feature_name in reset_list:
+                # 重新计算
+                feature_value = self.get_feature_by_name(feature_dict, feature_name, sentences_list,
+                                                         tokens_list, train_data, train_score, name)
+            assert feature_value is not None, u"feature不能为none呀"
+            feature = self.concatenate_feature(feature, feature_value)
 
-        if 'mean_sentence_length' in feature_list:
-            feature = self.concatenate_feature(feature, self.mean_sentence_length)
-        if 'var_sentence_length' in feature_list:
-            feature = self.concatenate_feature(feature, self.var_sentence_length)
+        if name == 'train':
+            self.normalizer = preprocessing.StandardScaler().fit(feature)
+            feature = self.normalizer.transform(feature)
+        else:
+            feature = self.normalizer.transform(feature)
 
-        if 'spell_error' in feature_list:
-            feature = self.concatenate_feature(feature, self.spell_error)
-
-        if 'mean_sentence_depth' in feature_list:
-            feature = self.concatenate_feature(feature, self.mean_sentence_depth)
-        if 'mean_sentence_level' in feature_list:
-            feature = self.concatenate_feature(feature, self.mean_sentence_length)
-
-        if 'essay_length' in feature_list:
-            feature = self.concatenate_feature(feature, self.essay_length)
-
-        if 'current_pos' in feature_list:
-            feature = self.concatenate_feature(feature, self.current_pos)
-
-        if 'error_pos' in feature_list:
-            feature = self.concatenate_feature(feature, self.error_pos)
-
-        if 'current_pos3' in feature_list:
-            feature = self.concatenate_feature(feature, self.current_pos3)
-
-        if 'error_pos3' in feature_list:
-            feature = self.concatenate_feature(feature, self.error_pos3)
-
-        if 'vocab_size' in feature_list:
-            feature = self.concatenate_feature(feature, self.vocab_size)
-
-        return feature
-
-    def get_train_feature(self, sentences_list, tokens_list, scores, train_data):
-        """ 获取training的feature
-        sentences_array, tokens_array 均已经tokenizer处理过
-        所有返回的特征的维度: ndarray类型 sample_num * feature_dim
-        """
-        #
-        # if self.train_feature is not None:
-        #     return self.train_feature
-
-        feature = self.get_feature(sentences_list, tokens_list, train_data)
-
-        if 'wv_similarity' in feature_list:
-            wv_similarity, wv_tf_vocab, wv_idf_diag, wv_tfidf = word_vector_similarity_train(tokens_list, scores)
-            self.wv_similarity = wv_similarity
-            self.wv_idf_diag = wv_idf_diag
-            self.wv_tf_vocab = wv_tf_vocab
-            self.wv_tfidf = wv_tfidf
-            feature = self.concatenate_feature(feature, wv_similarity)
-
-        if 'pos_bigram' in feature_list:
-            pos_bigram, pos_2TF, pos_2tf_vocab = pos_gram_train(tokens_list, 2)
-            self.pos_bigram = pos_bigram
-            self.pos_2tf_vocab = pos_2tf_vocab
-            self.pos_2TF = pos_2TF
-            feature = self.concatenate_feature(feature, pos_bigram)
-
-        if 'pos_trigram' in feature_list:
-            pos_trigram, pos_3TF, pos_3tf_vocab = pos_gram_train(tokens_list, 3)
-            self.pos_trigram = pos_trigram
-            self.pos_3tf_vocab = pos_3tf_vocab
-            self.pos_3TF = pos_3TF
-            feature = self.concatenate_feature(feature, pos_trigram)
-
-        if 'word_bigram' in feature_list:
-            word_bigram, word_bigram_TF, word_bigram_tf_vocab = word_bigram_train(tokens_list)
-            self.word_bigram = word_bigram
-            self.word_bigram_tf_vocab = word_bigram_tf_vocab
-            self.word_bigram_TF = word_bigram_TF
-            feature = self.concatenate_feature(feature, word_bigram)
-
-        if 'word_trigram' in feature_list:
-            word_trigram, word_trigram_TF, word_trigram_tf_vocab = word_trigram_train(tokens_list)
-            self.word_trigram = word_trigram
-            self.word_trigram_tf_vocab = word_trigram_tf_vocab
-            self.word_trigram_TF = word_trigram_TF
-            feature = self.concatenate_feature(feature, word_trigram)
-
-        if 'semantic_vector_similarity' in feature_list:
-            semvec_sim = semantic_vector_similarity(train_data, train_data)
-            self.semantic_vector_similarity = semvec_sim
-            feature = self.concatenate_feature(feature, semvec_sim)
-
-        if 'bag_of_words' in feature_list:
-            bag_of_words, bag_of_words_TF, bag_of_words_tf_vocab = bag_of_words_train(tokens_list)
-            self.bag_of_words = bag_of_words
-            self.bag_of_words_tf_vocab = bag_of_words_tf_vocab
-            self.bag_of_words_TF = bag_of_words_TF
-            feature = self.concatenate_feature(feature, word_trigram)
-
-        normalizer = preprocessing.StandardScaler().fit(feature)
-        feature = normalizer.transform(feature)
-
-        # print(normalizer)
-
-        # feature = preprocessing.normalize(feature, norm='max', axis=0)
-        self.train_feature = feature
-        self.Normalizer = normalizer
-
-        # print(feature)
-        # print('train_feature', feature.shape)
-        return feature
-
-    def get_save_train_feature(self, sentences_list, tokens_list):
-        print("use_save")
-        feature = self.get_save_feature()
-
-        if 'wv_similarity' in feature_list:
-            feature = self.concatenate_feature(feature, self.wv_similarity)
-        if 'pos_bigram' in feature_list:
-            feature = self.concatenate_feature(feature, self.pos_bigram)
-        if 'pos_trigram' in feature_list:
-            feature = self.concatenate_feature(feature, self.pos_trigram)
-        if 'word_bigram' in feature_list:
-            feature = self.concatenate_feature(feature, self.word_bigram)
-        if 'word_trigram' in feature_list:
-            feature = self.concatenate_feature(feature, self.word_trigram)
-        if 'semantic_vector_similarity' in feature_list:
-            feature = self.concatenate_feature(feature, self.semantic_vector_similarity)
-
-        normalizer = preprocessing.StandardScaler().fit(feature)
-        feature = normalizer.transform(feature)
-
-        self.train_feature = feature
-        self.Normalizer = normalizer
-
-        return feature
-
-    def get_test_feature(self, sentences_list, tokens_list, train_score, train_data, test_data):
-        """ """
-        feature = self.get_feature(sentences_list, tokens_list, test_data)
-        # #####################
-        # # feature = self.append_feature(feature, wv_similarity, pos_bigram, word_bigram, word_trigram)
-        if 'wv_similarity' in feature_list:
-            wv_similarity = word_vector_similarity_test(tokens_list, train_score, self.wv_tf_vocab, self.wv_idf_diag,
-                                                        self.wv_tfidf)
-            feature = self.concatenate_feature(feature, wv_similarity)
-
-        if 'pos_bigram' in feature_list:
-            pos_bigram = pos_gram_test(tokens_list, self.pos_2TF, self.pos_2tf_vocab, 2)
-            feature = self.concatenate_feature(feature, pos_bigram)
-
-        if 'pos_trigram' in feature_list:
-            pos_trigram = pos_gram_test(tokens_list, self.pos_3TF, self.pos_3tf_vocab, 2)
-            feature = self.concatenate_feature(feature, pos_trigram)
-
-        if 'word_bigram' in feature_list:
-            word_bigram = word_bigram_test(tokens_list, self.word_bigram_TF, self.word_bigram_tf_vocab)
-            feature = self.concatenate_feature(feature, word_bigram)
-
-        if 'word_trigram' in feature_list:
-            word_trigram = word_trigram_test(tokens_list, self.word_trigram_TF, self.word_trigram_tf_vocab)
-            feature = self.concatenate_feature(feature, word_trigram)
-
-        if 'semantic_vector_similarity' in feature_list:
-            semvec_sim = semantic_vector_similarity(train_data, test_data)
-            feature = self.concatenate_feature(feature, semvec_sim)
-
-        if 'bag_of_words' in feature_list:
-            bag_of_words = bag_of_words_test(tokens_list, self.bag_of_words_TF, self.bag_of_words_tf_vocab)
-            feature = self.concatenate_feature(feature, bag_of_words)
-
-        # print("test_before",feature[:,1])
-
-        # feature = preprocessing.normalize(feature, norm='max', axis=0)
-        # add_feature = self.get_add_feature(sentences_list, tokens_list)
-        # feature = self.concatenate_feature(feature, add_feature)
-        feature = self.Normalizer.transform(feature)
-
-        # print("test_after", feature[:,1])
-
-        # print('test_feature', feature.shape)
-        return feature
+        # print(feature_dict)
+        return feature, feature_dict

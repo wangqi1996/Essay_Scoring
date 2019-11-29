@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 
 from src.util.tfidf import process_tfidf_data, tfidf_train, tfidf_test, tfTF_train, tfTF_test
-from src.util.util import matrix_cosine_similarity, pos_tagging, ngram, constituency_tree
+from src.util.util import matrix_cosine_similarity, pos_tagging, ngram, constituency_tree, remove_stop_word
 from sklearn.linear_model import BayesianRidge
 
 """
@@ -57,13 +57,10 @@ def word_vector_similarity_test(test_data, train_score_list, tf_vocab, idf_diag,
     return result.reshape(test_sample_num, 1)
 
 
-def pos_gram_train(train_data, gram):
+def pos_gram_train(tagged_data, gram):
     """ input: tokens"""
 
     print("pos_bigram_train")
-
-    # 1. 词性标注
-    tagged_data = pos_tagging(train_data)
 
     # 2. 组成2-gram
     gramed_data = ngram(tagged_data, gram)
@@ -75,15 +72,13 @@ def pos_gram_train(train_data, gram):
     return train_tfTF, TF, tf_vocab
 
 
-def pos_gram_test(test_data, TF, tf_vocab, gram):
+def pos_gram_test(tagged_data, TF, tf_vocab, gram):
     """ input: tokens (已经tokenizer的)"""
 
     print("pos_bigram_test")
 
     assert TF is not None, u"测试阶段，TF不能为None"
     assert tf_vocab is not None, u"测试阶段，tf_vocab不能为None"
-    # 1. 词性标注
-    tagged_data = pos_tagging(test_data)
 
     # 2. 组成2-gram
     gramed_data = ngram(tagged_data, gram)
@@ -120,7 +115,7 @@ def mean_clause(data):
 NGRAM_PATH = "../../data/good_pos_ngrams.p"
 
 
-def good_pos_ngrams(data, gram=2):
+def good_pos_ngrams(tagged_data, gram=2):
     """
     input: tokens
     """
@@ -132,8 +127,6 @@ def good_pos_ngrams(data, gram=2):
                            'NNP NNP NNP', 'NNP NNP NNP NNP', 'NNP NNP NNP .', 'NNP NNP .', 'NNP NNP . TO',
                            'NNP .', 'NNP . TO', 'NNP . TO NNP', '. TO', '. TO NNP', '. TO NNP NNP',
                            'TO NNP', 'TO NNP NNP']
-
-    tagged_data = pos_tagging(data)
 
     # 2. 组成2-gram
     gramed_data = ngram(tagged_data, gram, join_char=' ')
@@ -151,14 +144,50 @@ def good_pos_ngrams(data, gram=2):
 
         correct_result.append(correct)
         uncorrect_result.append(uncorrect)
+
     return np.array(correct_result).reshape(-1, 1), np.array(uncorrect_result).reshape(-1, 1)
+
+
+def pos_tagger(tagged_data):
+    """
+    input: tokens
+    """
+
+    PRP_result = []
+    MD_result = []
+    NNP_result = []
+    COMMA_result = []
+    comma = ['.', ',', '!', '?']
+    for i in tagged_data:
+        r = {"PRP": 0, "MD": 0, "NNP": 0, "COMMA": 0}
+        for j in i:
+            if j in r.keys():
+                r[j] += 1
+            if j in comma:
+                r['COMMA'] += 1
+        PRP_result.append(r['PRP'])
+        MD_result.append((r['MD']))
+        NNP_result.append(r['NNP'])
+        COMMA_result.append(r['COMMA'])
+
+    PRP_result = np.array(PRP_result).reshape(-1, 1)
+    MD_result = np.array(MD_result).reshape(-1, 1)
+    NNP_result = np.array(NNP_result).reshape(-1, 1)
+    COMMA_result = np.array(COMMA_result).reshape(-1, 1)
+    return PRP_result, MD_result, NNP_result, COMMA_result
 
 
 def vocab_size(data):
     """ input: tokens"""
 
-    result = []
-    for essay in data:
-        result.append(len(set(essay)))
+    unique_len = []
+    essay_len = []
+    data = remove_stop_word(data)
 
-    return np.array(result).reshape(-1, 1)
+    for essay in data:
+        unique_len.append(len(set(essay)))
+        essay_len.append(len(essay))
+
+    unique_len = np.array(unique_len).reshape(-1, 1)
+    essay_len = np.array(essay_len).reshape(-1, 1)
+    return unique_len, unique_len / essay_len

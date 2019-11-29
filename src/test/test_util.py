@@ -2,7 +2,7 @@
 
 import unittest
 
-from feature.wangdq import good_pos_ngrams, vocab_size
+from feature.wangdq import good_pos_ngrams, vocab_size, pos_tagger
 from feature.xiaoyl import word_length, get_sentence_length
 from src.util.tfidf import process_tfidf_data, tfidf_train, tfidf_test
 from src.util.util import word_stemming_remove_stop, tokenizer, pos_tagging, ngram, constituency_tree, get_sentences
@@ -103,7 +103,7 @@ class TestUtil(unittest.TestCase):
         corpus = tokenizer(corpus)
         # print(corpus)
 
-        data = pos_tagging(corpus)
+        data = pos_tagger(corpus)
         return data
 
     def test_bigram(self):
@@ -150,6 +150,14 @@ class TestUtil(unittest.TestCase):
 
         return result
 
+    def test_pos_tag2(self):
+        corpus = [
+            'Computers do  have any affect on kids we just love going on cause we use it for help and this persuade the readers of the local newspaper cause we need to be able to communicate also do writing essays and doing social studies or science homework my ideas are let us go computers cause were not bothering u can just leave us alone and let us do what you need to do cause what computers are what give us information for we have to do and were to do wat we got ta do and u people can just leave us alone cause are nt addicting to me or anyone and if we were it still would it matter cause a computers a computer u do nt punish it because just punish us from the computer punish us because of it cause its the computer fault it can be addicting cause the computer is device that ']
+
+        corpus = tokenizer(corpus)
+
+        # return result
+
     def test_get_sentences(self):
         corpus = [
             'A . B.C'
@@ -170,19 +178,13 @@ class TestUtil(unittest.TestCase):
 
     def test_good_pos_ngrams(self):
         corpus = [
-            'This is the first document. the a',
-            'This is the second seconds document.',
-            'And the third one. fying',
-            'Is this the first documents?',
-            'a a a a'
-        ]
+            'Computers do  have any affect on kids we just love going on cause we use it for help and this persuade the readers of the local newspaper cause we need to be able to . communicate also do writing essays and doing social studies or science . homework my ideas are let us go computers cause were not bothering u can just leave us alone and let us do what you need to do cause what computers are what give us information for we have to do and were to do wat we got ta do and u people can just leave us alone cause are nt addicting to me or anyone and if we were it still would it matter cause a computers a computer u do nt punish it because just punish us from the computer punish us because of it cause its the computer fault it can be addicting cause the computer . is device that ']
 
         corpus = tokenizer(corpus)
         print(corpus)
 
-        data = good_pos_ngrams(corpus)
+        data = good_pos_ngrams(corpus, 3)
         print(data)
-
 
     def test_vocab_size(self):
         corpus = [
@@ -198,5 +200,7 @@ class TestUtil(unittest.TestCase):
 
         result = vocab_size(corpus)
         print(result)
+
+
 if __name__ == '__main__':
     TestUtil().test_pos_tag()

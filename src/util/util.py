@@ -75,7 +75,7 @@ def matrix_cosine_similarity(matrix1, matrix2=None):
 
 
 def pos_tagging(train_data):
-    """ 词性标注 """
+    """ 词性标注 input:tokens"""
     result = []
     for sample in train_data:
         pos_tag = nltk.pos_tag(sample)

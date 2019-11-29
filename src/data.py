@@ -13,7 +13,6 @@ class Dataset:
         self.data = {}
         self.normalize_dict = {}
         self.feature = {}  # 存储feature和中间变量
-        self.test_feature = {}
 
     def load_from_raw_file(self, filename, field_require):
         tokenizer = spacy.load("en_core_web_sm")
@@ -48,19 +47,13 @@ class Dataset:
     #     for sample in self.data[set_id]:
     #         sample[field] = (sample[field] - min_value) / (max_value - min_value)
 
-    def save_feature(self, set_id, data):
+    def save_feature(self, set_id, data, name):
         self.feature.setdefault(str(set_id), {})
-        self.feature[str(set_id)].update(data)
+        self.feature[str(set_id)].setdefault(name, {})
+        self.feature[str(set_id)][name].update(data)
 
-    def save_test_feature(self, set_id, data):
-        self.test_feature.setdefault(str(set_id), {})
-        self.test_feature[str(set_id)].update(data)
-
-    def load_feature(self, set_id):
-        return self.feature.get(str(set_id), {})
-
-    def load_test_feature(self, set_id):
-        return self.test_feature.get(str(set_id), {})
+    def load_feature(self, set_id, name):
+        return self.feature.get(str(set_id), {}).get(name, {})
 
     @staticmethod
     def get_data_list(data, acquire_score):
@@ -99,20 +92,20 @@ class Dataset:
         return dataset
 
 # load_from_raw_file includes tokenize process, which is time consuming
-#
-train_dataset = Dataset()
-train_dataset.load_from_raw_file('../data/train.tsv', ['essay_set', 'essay_id', 'essay', 'domain1_score'])
-Dataset.save(train_dataset, '../data/train.pickle')
 # #
-dev_dataset = Dataset()
-dev_dataset.load_from_raw_file('../data/dev.tsv', ['essay_set', 'essay_id', 'essay', 'domain1_score'])
-Dataset.save(dev_dataset, '../data/dev.pickle')
+# train_dataset = Dataset()
+# train_dataset.load_from_raw_file('../data/train.tsv', ['essay_set', 'essay_id', 'essay', 'domain1_score'])
+# Dataset.save(train_dataset, '../data/train.pickle')
+# # #
+# dev_dataset = Dataset()
+# dev_dataset.load_from_raw_file('../data/dev.tsv', ['essay_set', 'essay_id', 'essay', 'domain1_score'])
+# Dataset.save(dev_dataset, '../data/dev.pickle')
+# # #
+# # #
 # #
-# #
-#
-test_dataset = Dataset()
-test_dataset.load_from_raw_file('../data/test.tsv', ['essay_set', 'essay_id', 'essay'])
-Dataset.save(test_dataset, '../data/test.pickle')
+# test_dataset = Dataset()
+# test_dataset.load_from_raw_file('../data/test.tsv', ['essay_set', 'essay_id', 'essay'])
+# Dataset.save(test_dataset, '../data/test.pickle')
 
 # train_dataset = Dataset.load("../data/essay_data/train.pickle")
 # dev_dataset = Dataset.load("../data/essay_data/dev.pickle")

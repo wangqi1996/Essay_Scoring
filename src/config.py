@@ -15,7 +15,8 @@ ESSAY_SET_FIELD = 'essay_set'
 ESSAY_ID_FIELD = 'essay_id'
 ESSAY_FIELD = 'essay'
 SCORE_FIELD = 'domain1_score'
-TOKENIZER_FIELD = 'essay_token'
+TOKENIZER_FIELD = 'essay_t' \
+                  'oken'
 
 pos2gram_dim = 250
 pos3gram_dim = 100
@@ -26,27 +27,38 @@ feature_list = [
 
     "wv_similarity",
     "pos_bigram",
-    # "pos_trigram",
+
     "word_bigram",
     "word_trigram",
-    #
-    # "mean_clause_length",
-    # "mean_clause_number",
-    #
+
     "mean_word_length",
     "var_word_length",
     "mean_sentence_length",
     "var_sentence_length",
-    #
+
     "spell_error",
-    # # "mean_sentence_depth",
-    # # "mean_sentence_level",
     "essay_length",
 
-    # "semantic_vector_similarity",
     "current_pos",
     "error_pos",
     "current_pos3",
     "error_pos3",
+
     "vocab_size",
+    'unique_size',
+
+    'PRP_result',
+    'MD_result',
+    'NNP_result',
+    'COMMA_result',
+    'bag_of_words',
+
+    # "mean_sentence_depth",
+    # "mean_sentence_level",
+
+    # "mean_clause_length",
+    # "mean_clause_number",
+    # "semantic_vector_similarity",
+    # "pos_trigram",
+
 ]

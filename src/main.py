@@ -18,15 +18,13 @@ from src.feature.feature import Feature
 from src.metrics import kappa
 import pandas as pd
 import numpy as np
-
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier
 from sklearn.linear_model import BayesianRidge
 
 import config
 
 
-
-def train(contain_test=False, use_save=False, model_name='SVR'):
+def train(use_save=False, model_name='SVR'):
     """ 训练模型 """
     # 1. 加载数据集
     print("start loading data_set")
@@ -48,76 +46,72 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
         dev_data = dev_dataset.data[str(set_id)]
         test_data = test_dataset.data[str(set_id)]
 
-        feature = train_dataset.load_feature(set_id)
-        feature_class = Feature.get_instance(feature)
-        # new_train_data = copy.deepcopy(train_data)
-        # new_train_data.extend(dev_data)
-        # train_data = new_train_data
+        train_feature_dict = train_dataset.load_feature(set_id, 'train')
+        feature_class = Feature.get_instance(train_feature_dict)
+
+        new_train_data = copy.deepcopy(train_data)
+        new_train_data.extend(dev_data)
+        train_data = new_train_data
+
         train_sentences_list, train_tokens_list, train_scores = Dataset.get_data_list(train_data,
                                                                                       acquire_score=True)
 
-        print("start compute the feature for essay set ", set_id)
+        print("start compute the feature for essay set  %s， train_set_len = %s" % (set_id, len(train_sentences_list)))
         st = time.time()
 
-        if use_save:
-            print('use_save')
-            train_feature = feature_class.get_save_train_feature(train_sentences_list, train_tokens_list)
-        else:
-            train_feature = feature_class.get_train_feature(train_sentences_list, train_tokens_list, train_scores,
-                                                            train_data)
-            train_dataset.save_feature(set_id, feature_class.save_feature(train_feature))
+        # if use_save:
+        #     train_feature = feature_class.get_save_train_feature(train_sentences_list, train_tokens_list)
+        # else:
+        #     train_feature = feature_class.get_train_feature(train_sentences_list, train_tokens_list, train_scores,
+        #                                                     train_data)
+
+        train_feature, train_feature_dict = feature_class.get_saved_feature_all(train_feature_dict,
+                                                                                train_sentences_list, train_tokens_list,
+                                                                                train_data, train_scores, 'train', [])
+        train_dataset.save_feature(set_id, train_feature_dict, 'train')
 
         et = time.time()
         print("end compute the feature for essay set, ", set_id, "time = ", et - st)
 
-        dev_sentences_list, dev_tokens_list, dev_scores = Dataset.get_data_list(dev_data, acquire_score=True)
-        dev_feature = feature_class.get_test_feature(dev_sentences_list, dev_tokens_list, train_scores, train_data,
-                                                     dev_data)
-        x = np.concatenate((train_feature, dev_feature), axis=0)
-        y = np.concatenate((train_scores, dev_scores), axis=0)
-
         # 3. 构建模型，训练
         use_dev = 'No' #手动修改
         clf = model(model_name, train_feature, train_scores, set_id)
-        # 加dev集训练
-        # clf = model(model_name, x, y, set_id)
 
         # 4. 测试
-        # dev_sentences_list, dev_tokens_list, dev_scores = Dataset.get_data_list(dev_data, acquire_score=True)
-        # dev_feature = feature_class.get_test_feature(dev_sentences_list, dev_tokens_list, train_scores, train_data,
-        #                                              dev_data)
+        dev_sentences_list, dev_tokens_list, dev_scores = Dataset.get_data_list(dev_data, acquire_score=True)
+        # if use_save:
+        #     dev_feature = train_dataset.load_feature(set_id, 'dev')
+        #     dev_feature = feature_class.get_test_save_feature(dev_feature, dev_sentences_list, dev_tokens_list,
+        #                                                       train_scores, train_data,
+        #                                                       dev_data)
+        # else:
+        #     dev_feature = feature_class.get_test_feature(dev_sentences_list, dev_tokens_list, train_scores, train_data,
+        #                                                  dev_data)
+        #
+        # train_dataset.save_feature(set_id, feature_class.save_feature(dev_feature), 'dev')
+        dev_feature_dict = train_dataset.load_feature(set_id, 'dev')
+        dev_feature, dev_feature_dict = feature_class.get_saved_feature_all(dev_feature_dict,
+                                                                            dev_sentences_list, dev_tokens_list,
+                                                                            dev_data, train_scores, 'dev', [])
+        train_dataset.save_feature(set_id, dev_feature_dict, 'dev')
+
         print('dev ends')
         predicted = clf.predict(dev_feature)
         qwk = kappa(dev_scores, predicted, weights='quadratic')
-        qwk_score_list.append(qwk)
         print(set_id, qwk)
         mean_qwk += qwk
 
-        # 交叉验证
-        # kf = KFold(n_splits=20, random_state=0)
-        #
-        # x = np.concatenate((train_feature, dev_feature), axis=0)
-        # y = np.concatenate((train_scores, dev_scores), axis=0)
-        #
-        # dev_predict_list = []
-        # model_list = []
-        # test_list = []
-        # dev_result_list = []
-        #
-        # for train_index, test_index in kf.split(x):
-        #     x_train, x_test = x[train_index], x[test_index]
-        #     y_train, y_test = y[train_index], y[test_index]
-        #
-        #     reg = model(model_name, x_train, y_train, set_id)
-        #
-        #     model_list.append(reg)
-        #     predict_dev_y = reg.predict()
+        test_sentences_list, test_tokens_list = Dataset.get_data_list(test_data, acquire_score=False)
+        # test_feature = feature_class.get_test_feature(test_sentences_list, test_tokens_list, train_scores,
+        #                                               train_data, test_data)
 
-        if contain_test:
-            test_sentences_list, test_tokens_list = Dataset.get_data_list(test_data, acquire_score=False)
-            test_feature = feature_class.get_test_feature(test_sentences_list, test_tokens_list, train_scores,
-                                                          train_data, test_data)
-            test_predicted = clf.predict(test_feature)
+        test_feature_dict = train_dataset.load_feature(set_id, 'test')
+        test_feature, test_feature_dict = feature_class.get_saved_feature_all(test_feature_dict,
+                                                                              test_sentences_list, test_tokens_list,
+                                                                              test_data, train_scores, 'test', [])
+        train_dataset.save_feature(set_id, test_feature_dict, 'test')
+
+        test_predicted = clf.predict(test_feature)
 
         for idx, sample in enumerate(test_data):
             # sample['domain1_score'] = int(test_predicted[idx])
@@ -204,7 +198,7 @@ if __name__ == '__main__':
     parse = argparse.ArgumentParser()
     parse.add_argument("--run", type=str, default='train', help='train or test', choices=['train', 'test'])
     parse.add_argument("--model", type=str, default='GBR', help='SVR, ', choices=['SVR', 'GBR'])
-    parse.add_argument("--use_save", type=bool, default=False, help='use saved feature or not')
+    parse.add_argument("--use_save", type=bool, default=True, help='use saved feature or not')
     args = parse.parse_args()
 
     run = args.run
@@ -212,8 +206,6 @@ if __name__ == '__main__':
     model_name = args.model
 
     if run == 'train':
-        train(contain_test=True, use_save=use_save, model_name=model_name)
-    elif run == 'test':
-        train(contain_test=False, use_save=use_save, model_name=model_name)
+        train(use_save=use_save, model_name=model_name)
     else:
         assert False, u"纳尼，居然还有这个选择能进来"
