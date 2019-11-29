@@ -19,19 +19,19 @@ TOKENIZER_FIELD = 'essay_t' \
                   'oken'
 
 pos2gram_dim = 250
-
 pos3gram_dim = 100
 
 word_2gram_dim = 1000
-word_3gram_dim = 500
+word_3gram_dim = 1000
 
 feature_list = [
     #
     "wv_similarity",
     "pos_bigram",
+    # "pos_trigram",
 
     "word_bigram",
-    "word_trigram",
+    # "word_trigram",
 
     "mean_word_length",
     "var_word_length",
@@ -53,15 +53,24 @@ feature_list = [
     'PRP_result',
     # 'MD_result',
     'NNP_result',
+    # 'COMMA_result',
 
-    #
-    # 'JJ_result',  # 形容词
-    # 'JJR_result',  # 比较级词语
-    # 'JJS_result',  # 最高级
+    'JJ_result',  # 形容词
+    'JJR_result',  # 比较级词语
+    'JJS_result',  # 最高级
     # 'RB_result',  # 副词
-    # 'RBR_result',  # 副词比较级
+    'RBR_result',  # 副词比较级
     # 'RBS_result',  # 副词比较级
     # 'PDT_result',  # 前限定词a
+
+    'NN_result',  # 名词
+
+    #  二元的
+    'RB_JJ',  # 副词 + 形容词
+    'JJR_NN',  # 最高级 + 名词
+    'JJS_NNPS',  # 最高级 + 专有名词复数
+    'RB_VB',  # 副词 + 动词
+    'RB_RB',  # 副词+副词
 
     'bag_of_words',
 
@@ -72,10 +81,5 @@ feature_list = [
     # "mean_clause_number",
 
     # "semantic_vector_similarity",
-    # "pos_trigram",
-
-    # 'COMMA_result',
-
-
 
 ]

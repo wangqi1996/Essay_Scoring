@@ -60,7 +60,8 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
         print("start compute the feature for essay set  %s， train_set_len = %s" % (set_id, len(train_sentences_list)))
         st = time.time()
 
-        reset_list = ['word_bigram', 'word_trigram', 'pos_bigram', 'pos_trigram']
+        # TODO 需要啥填什麽
+        reset_list = []
         train_feature, train_feature_dict = feature_class.get_saved_feature_all(train_feature_dict,
                                                                                 train_sentences_list, train_tokens_list,
                                                                                 train_data, train_scores, 'train',
@@ -111,7 +112,6 @@ def train(contain_test=False, use_save=False, model_name='SVR'):
     print(mean_qwk)
     save_info_to_file(feature_list, use_dev, qwk_score_list, mean_qwk)
 
-    # break
     # 保存特征 只能保存dataset对象了
     train_dataset.save(train_dataset, TRAIN_DADA_PATH)
 

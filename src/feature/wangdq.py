@@ -3,11 +3,9 @@ import os
 import pickle
 
 import numpy as np
-from sklearn.feature_extraction.text import CountVectorizer
 
 from src.util.tfidf import process_tfidf_data, tfidf_train, tfidf_test, tfTF_train, tfTF_test
-from src.util.util import matrix_cosine_similarity, pos_tagging, ngram, constituency_tree, remove_stop_word
-from sklearn.linear_model import BayesianRidge
+from src.util.util import matrix_cosine_similarity, ngram, constituency_tree, remove_stop_word
 
 """
 输入分为两种： sequence or  tokens
@@ -155,57 +153,37 @@ def good_pos_ngrams(tagged_data, gram=2):
     return np.array(correct_result).reshape(-1, 1), np.array(uncorrect_result).reshape(-1, 1)
 
 
-def pos_tagger(tagged_data):
+def pos_tagger(tagged_data, label):
     """
     input: tokens
     """
     print("pos_tagger")
-    PRP_result = []
-    MD_result = []
-    NNP_result = []
-    COMMA_result = []
-    JJ_result = []
-    JJR_result = []
-    JJS_result = []
-    RB_result = []
-    RBR_result = []
-    RBS_result = []
-    PDT_result = []
-    comma = ['.', ',', '!', '?']
+    result = []
+
     for i in tagged_data:
-        r = {"PRP": 0, "MD": 0, "NNP": 0, "COMMA": 0,
-             "JJ": 0, "JJR": 0, "JJS": 0, "RB": 0,
-             "RBR": 0, "RBS": 0, "PDT": 0}
+        temp = 0
         for j in i:
-            if j in r.keys():
-                r[j] += 1
-            if j in comma:
-                r['COMMA'] += 1
-        PRP_result.append(r['PRP'])
-        MD_result.append((r['MD']))
-        NNP_result.append(r['NNP'])
-        COMMA_result.append(r['COMMA'])
-        JJ_result.append(r['JJ'])
-        JJS_result.append(r['JJS'])
-        JJR_result.append(r['JJR'])
-        RB_result.append(r['RB'])
-        RBR_result.append(r['RBR'])
-        RBS_result.append(r['RBS'])
-        PDT_result.append(r['PDT'])
+            if j == label:
+                temp += 1
+        result.append(temp)
+    return np.array(result).reshape(-1, 1)
 
-    PRP_result = np.array(PRP_result).reshape(-1, 1)
-    MD_result = np.array(MD_result).reshape(-1, 1)
-    NNP_result = np.array(NNP_result).reshape(-1, 1)
-    COMMA_result = np.array(COMMA_result).reshape(-1, 1)
-    JJ_result = np.array(JJ_result).reshape(-1, 1)
-    JJS_result = np.array(JJS_result).reshape(-1, 1)
-    JJR_result = np.array(JJR_result).reshape(-1, 1)
-    RB_result = np.array(RB_result).reshape(-1, 1)
-    RBR_result = np.array(RBR_result).reshape(-1, 1)
-    RBS_result = np.array(RBS_result).reshape(-1, 1)
-    PDT_result = np.array(PDT_result).reshape(-1, 1)
 
-    return PRP_result, MD_result, NNP_result, COMMA_result, JJ_result, JJS_result, JJR_result, RB_result, RBR_result, RBS_result, PDT_result
+def pos_tagger2(tagged_data, label):
+    """
+    input: tokens
+    """
+    print("pos_tagger2")
+    result = []
+    gramed_data = ngram(tagged_data, n=2, join_char='_')
+    for i in gramed_data:
+        temp = 0
+        for j in i:
+            if j == label:
+                temp += 1
+        result.append(temp)
+
+    return np.array(result).reshape(-1, 1)
 
 
 def vocab_size(data):

@@ -5,7 +5,7 @@ from sklearn import preprocessing
 from src.config import feature_list
 from src.feature.iku import spell_error, Mean_sentence_depth_level, essay_length
 from src.feature.wangdq import word_vector_similarity_train, word_vector_similarity_test, \
-    mean_clause, pos_gram_train, pos_gram_test, good_pos_ngrams, vocab_size, pos_tagger
+    mean_clause, pos_gram_train, pos_gram_test, good_pos_ngrams, vocab_size, pos_tagger, pos_tagger2
 from src.feature.xiaoyl import word_length, get_sentence_length, word_bigram_train, word_bigram_test, \
     word_trigram_train, word_trigram_test, bag_of_words_train, bag_of_words_test
 from util.util import pos_tagging
@@ -416,6 +416,24 @@ class Feature:
                 "PDT_result": PDT_result
             })
             return PDT_result
+
+        if feature_name in ["PRP_result", "MD_result", "NNP_result", "COMMA_result", "JJ_result", "JJS_result",
+                            "JJR_result", "RB_result", "RBR_result", "RBS_result", "PDT_result", "NN_result"]:
+            label = feature_name[:-7]
+            feature_value = pos_tagger(self.get_tagged_data(token_set), label)
+            feature_dict.update({
+                feature_name: feature_value
+            })
+
+            return feature_value
+
+        if feature_name in ['RB_JJ', 'JJR_NN', 'JJS_NNPS', 'RB_VB', 'RB_RB']:
+            feature_value = pos_tagger2(self.get_tagged_data(token_set), feature_name)
+            feature_dict.update({
+                feature_name: feature_value
+            })
+
+            return feature_value
 
         if 'wv_similarity' == feature_name:
             if name == 'train':
